@@ -15,7 +15,7 @@ def load_module(mod):
     cont.show()
 
 def destroy(obj, event, *args, **kargs):
-    print "DEBUG: window destroy callback called!"
+    print "DEBUG: window destroy callback called! kabum!"
     elementary.exit()
 
 if __name__ == "__main__":
@@ -50,6 +50,13 @@ if __name__ == "__main__":
     sc.size_hint_align_set(-1.0, -1.0)
     box0.pack_end(sc)
     sc.show()
+
+    quitbt = elementary.Button(win)
+    quitbt.clicked = destroy
+    quitbt.label_set("Quit")
+    quitbt.size_hint_align_set(-1.0, 0.0)
+    quitbt.show()
+    box0.pack_end(quitbt)
 
     box1 = elementary.Box(win)
     box1.size_hint_weight_set(1.0, -1.0)
