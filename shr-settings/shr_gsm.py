@@ -33,7 +33,7 @@ class Gsm(module.AbstractModule):
 
         winope = elementary.Window("listProviders", elementary.ELM_WIN_BASIC)
         winope.title_set("List Providers")
-        winope.destroy = destroy
+        winope.destroy = self.destroy
 
         box0 = elementary.Box(winope)
         box0.size_hint_weight_set(1.0, 1.0)
