@@ -1,13 +1,15 @@
 import elementary
 def totest(obj, event, *argns, **kargs):
+    print event
     print "it works!"
+    obj.label_set("lol")
 def name():
     print "name"
     return "Test"
 def icon():
     return 0
 def enabled():
-    return 0
+    return True
 def view(win):
     bt = elementary.Button(win)
     bt.clicked = totest
