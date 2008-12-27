@@ -53,7 +53,7 @@ class Gsm(module.AbstractModule):
 	  if len(line)>2:
 	      opeAvbt = elementary.Button(winope)
 	      opeAvbt.label_set( line[0].replace("(","")+" "+line[2].replace("'","") )
-	      opeAvbt.clicked = operatorSelect
+	      opeAvbt.clicked = self.operatorSelect
 	      opeAvbt.size_hint_align_set(-1.0, 0.0)
 	      opeAvbt.show()
 	      box0.pack_end(opeAvbt)
