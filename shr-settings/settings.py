@@ -2,8 +2,6 @@ import elementary
 import edje
 import evas
 
-modtoshow = 0
-
 def destroy(obj, event, *args, **kargs):
     print "DEBUG: window destroy callback called!"
     elementary.exit()
@@ -24,7 +22,6 @@ def justfortest(obj, event, *args, **kargs):
     print "hardcoded button for testing purposes"
 
 if __name__ == "__main__":
-    #  C{function(object, event_info, *args, **kargs)}
     elementary.init()
     win = elementary.Window("settings", elementary.ELM_WIN_BASIC)
     win.title_set("Settings")
@@ -50,9 +47,6 @@ if __name__ == "__main__":
     fr.content_set(lb)
     lb.show()
 
-#    tb = elementary.Toolbar(win)
-#    tb.show()
-
     sc = elementary.Scroller(win)
     sc.size_hint_weight_set(1.0, 1.0)
     sc.size_hint_align_set(-1.0, -1.0)
@@ -70,11 +64,6 @@ if __name__ == "__main__":
     bt.size_hint_align_set(-1.0, 0.0)
     box1.pack_end(bt)
     bt.show()
-
-    #path = 'modules/'
-    #for infile in glob.glob( os.path.join(path, '*.py') ):
-    #    print infile
-
 
     #TODO: handle modules automatically
     import shr_gsm
