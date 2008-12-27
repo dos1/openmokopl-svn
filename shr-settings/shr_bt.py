@@ -4,12 +4,6 @@ class Bt(module.AbstractModule):
     def name(self):
         return "Bluetooth"
 
-    def icon(self):
-        return 0
-
-    def enabled(self):
-        return True
-
     def view(self, win):
         box1 = elementary.Box(win)
         toggle0 = elementary.Toggle(win)

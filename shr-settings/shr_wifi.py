@@ -3,6 +3,7 @@ import elementary, module
 class Wifi(module.AbstractModule):
     def name(self):
         return "WiFi"
+    
     def view(self, win):
         box1 = elementary.Box(win)
         toggle0 = elementary.Toggle(win)

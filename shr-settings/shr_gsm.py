@@ -3,8 +3,10 @@ import module, os, re, sys, elementary
 class Gsm(module.AbstractModule):
     def name(self):
         return "GSM"
+
     def destroy(self, obj, event, *args, **kargs):
         print "DEBUG: window destroy callback called! kabum!"
+        
     def operatorSelect(self, obj, event, *args, **kargs):
         print "clik"
 

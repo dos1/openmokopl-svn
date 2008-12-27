@@ -2,7 +2,8 @@ import elementary
 import edje
 import evas
 
-def load_module(mod):
+def load_module(module):
+    mod = module();
     if mod.enabled():
         frame = elementary.Frame(win)
         frame.label_set(mod.name()+" settings")
@@ -68,8 +69,7 @@ if __name__ == "__main__":
 
     modules = [ shr_gsm.Gsm, shr_bt.Bt, shr_wifi.Wifi, shr_clock.Clock, shr_profile.Profile, shr_misc.Misc, shr_test.Test ]
     for mod in modules:
-        module = mod();
-        load_module(module)
+        load_module(mod)
     #end of loading modules
 
     win.show()
