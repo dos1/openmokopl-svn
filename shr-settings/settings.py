@@ -3,16 +3,16 @@ import edje
 import evas
 
 def load_module(mod):
-    frame = elementary.Frame(win)
-    frame.label_set(mod.name()+" settings")
-    box1.pack_end(frame)
-    frame.size_hint_align_set(-1.0, 0.0)
-    frame.show()
+    if mod.enabled():
+        frame = elementary.Frame(win)
+        frame.label_set(mod.name()+" settings")
+        box1.pack_end(frame)
+        frame.size_hint_align_set(-1.0, 0.0)
+        frame.show()
 
-    cont = mod.view(win)
-    frame.content_set(cont)
-    cont.size_hint_align_set(-1.0, 0.0)
-    cont.show()
+        cont = mod.view(win)
+        frame.content_set(cont)
+        cont.show()
 
 def destroy(obj, event, *args, **kargs):
     print "DEBUG: window destroy callback called! kabum!"
@@ -64,9 +64,9 @@ if __name__ == "__main__":
     box1.show()
 
     #loading modules
-    import shr_gsm, shr_bt, shr_wifi, shr_test
+    import shr_gsm, shr_bt, shr_wifi, shr_clock, shr_profile, shr_misc, shr_test
 
-    modules = [ shr_gsm, shr_bt, shr_wifi, shr_test ]
+    modules = [ shr_gsm, shr_bt, shr_wifi, shr_clock, shr_profile, shr_misc, shr_test ]
     for mod in modules:
         load_module(mod)
     #end of loading modules
@@ -74,4 +74,3 @@ if __name__ == "__main__":
     win.show()
     elementary.run()
     elementary.shutdown()
-

@@ -3,6 +3,8 @@ def name():
     return "Bluetooth"
 def icon():
     return 0
+def enabled():
+    return True
 def view(win):
     box1 = elementary.Box(win)
     toggle0 = elementary.Toggle(win)

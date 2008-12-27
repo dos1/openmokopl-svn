@@ -6,6 +6,8 @@ def name():
     return "Test"
 def icon():
     return 0
+def enabled():
+    return 0
 def view(win):
     bt = elementary.Button(win)
     bt.clicked = totest

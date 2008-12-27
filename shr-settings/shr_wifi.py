@@ -3,6 +3,8 @@ def name():
     return "WiFi"
 def icon():
     return 0
+def enabled():
+    return 1
 def view(win):
     box1 = elementary.Box(win)
     toggle0 = elementary.Toggle(win)
