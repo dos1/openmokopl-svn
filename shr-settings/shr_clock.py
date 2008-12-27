@@ -1,13 +1,11 @@
-import elementary
-def name():
-    return "Date/time"
-def icon():
-    return 0
-def enabled():
-    return True
-def view(win):
-    cl = elementary.Clock(win)
-    return cl
+import module, elementary
+
+class Clock(module.AbstractModule):
+    def name(self):
+        return "Date/time"
+    def view(self, win):
+        cl = elementary.Clock(win)
+        return cl
 
 if __name__ == "__main__":
     print "This is "+name()+" module for shr-settings."

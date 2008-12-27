@@ -66,9 +66,10 @@ if __name__ == "__main__":
     #loading modules
     import shr_gsm, shr_bt, shr_wifi, shr_clock, shr_profile, shr_misc, shr_test
 
-    modules = [ shr_gsm, shr_bt, shr_wifi, shr_clock, shr_profile, shr_misc, shr_test ]
+    modules = [ shr_gsm.Gsm, shr_bt.Bt, shr_wifi.Wifi, shr_clock.Clock, shr_profile.Profile, shr_misc.Misc, shr_test.Test ]
     for mod in modules:
-        load_module(mod)
+        module = mod();
+        load_module(module)
     #end of loading modules
 
     win.show()
