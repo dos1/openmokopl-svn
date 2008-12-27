@@ -8,6 +8,8 @@ class Test(module.AbstractModule):
     def name(self, ):
         print "name"
         return "Test"
+    def enabled(self, ):
+        return 0
     def view(self, win):
         bt = elementary.Button(win)
         bt.clicked = self.totest
