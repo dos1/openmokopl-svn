@@ -1,3 +1,0 @@
-#!/bin/sh
-cd /home/root/python/elementary/shr-settings/
-python settings.py
