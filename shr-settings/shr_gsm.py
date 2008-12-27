@@ -1,5 +1,13 @@
 import module, os, re, sys, elementary
 
+class Button2( elementary.Button ):
+    mOpeNr = ""
+    def set_opeNr( self, mOpeNr ):
+        self.mOpeNr = mOpeNr
+
+    def get_opeNr( self ):
+        return self.mOpeNr
+
 class Gsm(module.AbstractModule):
     def name(self):
         return "GSM"
@@ -8,6 +16,9 @@ class Gsm(module.AbstractModule):
         print "DEBUG: window destroy callback called! kabum!"
         
     def operatorSelect(self, obj, event, *args, **kargs):
+        os.popen("echo \"gsmnetwork.RegisterWithProvider( "+obj.get_opeNr()+" )\" | cli-framework", "r");
+        print "set operator: "+obj.get_opeNr()
+        #TODO - zamkniecie okna
         print "clik"
 
     def operatorsList(self, obj, event, *args, **kargs):
@@ -48,15 +59,22 @@ class Gsm(module.AbstractModule):
 
         resA = res.split("\n")
 
+        btNr = 0
         for l in resA:
-	  line = l.split(",")
-	  if len(line)>2:
-	      opeAvbt = elementary.Button(winope)
-	      opeAvbt.label_set( line[0].replace("(","")+" "+line[2].replace("'","") )
-	      opeAvbt.clicked = self.operatorSelect
-	      opeAvbt.size_hint_align_set(-1.0, 0.0)
-	      opeAvbt.show()
-	      box0.pack_end(opeAvbt)
+            line = l.split(",")
+            if len(line)>2:
+                opeAvbt = Button2(winope)
+                if line[1]=="'current'":
+                    add = " current "
+                else :
+                    add = "";
+                btNr+= 1
+                opeAvbt.label_set( line[0].replace("(","")+" "+line[2].replace("'","")+add )
+                opeAvbt.set_opeNr( str(line[0].replace("(","")) )
+                opeAvbt.clicked = self.operatorSelect
+                opeAvbt.size_hint_align_set(-1.0, 0.0)
+                opeAvbt.show()
+                box0.pack_end(opeAvbt)
 
         bg = elementary.Background(winope)
         winope.resize_object_add(bg)
