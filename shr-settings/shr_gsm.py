@@ -71,6 +71,11 @@ class Gsm(module.AbstractModule):
         box0.pack_start(fr)
         fr.show()
 
+        box1 = elementary.Box(self.winope)
+        box1.size_hint_weight_set(1.0, 1.0)
+	fr.content_set(box1)
+        box1.show()
+
         resA = res.split("\n")
         btNr = 0
         for l in resA:
@@ -87,7 +92,7 @@ class Gsm(module.AbstractModule):
                 opeAvbt.clicked = self.operatorSelect
                 opeAvbt.size_hint_align_set(-1.0, 0.0)
                 opeAvbt.show()
-                box0.pack_end(opeAvbt)
+                box1.pack_end(opeAvbt)
 
         opeAvbt = elementary.Button(self.winope)
         opeAvbt.label_set( "Cancel" )
