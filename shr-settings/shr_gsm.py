@@ -10,6 +10,8 @@ source
 http://git.freesmartphone.org/?p=specs.git;a=blob_plain;f=html/org.freesmartphone.GSM.Device.html;hb=HEAD
 - dbus
 http://74.125.77.132/search?q=cache:lrCoc3DSa0gJ:www.freesmartphone.org/index.php/Tutorials/GSM_python+python+dbus+%22org.freesmartphone.ogsmd%22&hl=pl&ct=clnk&cd=3&gl=pl&client=firefox-a
+- target :)
+http://shr-project.org/trac/wiki/Draft:SHRSettingsApp
 """
 
 class Button2( elementary.Button ):
@@ -52,6 +54,10 @@ class GSMstateContener:
         if self.dbus_state==1:
             self.gsm_device_iface.SetAntennaPower(b)
 
+    def gsmdevice_GetInfo(self):
+        if self.dbus_state==1:
+            return self.gsm_device_iface.GetInfo()
+
     def gsmnetwork_ListProviders(self):
         if self.dbus_state==1:
             return self.gsm_network_iface.ListProviders()
@@ -90,7 +96,10 @@ class Gsm(module.AbstractModule):
 
         self.winope.hide()
         # to jest totalna proteza trzeba to poprawic
-        
+    
+    def destroyInfo(self, obj, event, *args, **kargs):
+        self.wininfo.hide()
+
     def operatorSelect(self, obj, event, *args, **kargs):
         #os.popen("echo \"gsmnetwork.RegisterWithProvider( "+obj.get_opeNr()+" )\" | cli-framework", "r");
         print "GSM operatorSelect [info] ["+str(obj.get_opeNr())+"]"
@@ -103,7 +112,6 @@ class Gsm(module.AbstractModule):
 
         self.thread = threading.Thread(target=self.operatorsList)
         self.thread.start()
-
 
     def operatorsList(self, obj, event, *args, **kargs):
         print "GSM operatorsList [inf]"
@@ -197,6 +205,74 @@ class Gsm(module.AbstractModule):
 
         self.GSMmodGUIupdate()
 
+    def informationbt(self, obj, event, *args, **kargs):
+        print "GSM infobt [inf]"
+
+        self.wininfo = elementary.Window("deviceInfo", elementary.ELM_WIN_BASIC)
+        self.wininfo.title_set("GSM modem information")
+        self.wininfo.autodel_set(True)
+
+        self.bginfo = elementary.Background(self.wininfo)
+        self.wininfo.resize_object_add(self.bginfo)
+        self.bginfo.size_hint_weight_set(1.0, 1.0)
+        self.bginfo.show()
+
+        box0 = elementary.Box(self.wininfo)
+        box0.size_hint_weight_set(1.0, 1.0)
+        self.wininfo.resize_object_add(box0)
+        box0.show()
+
+        fr = elementary.Frame(self.wininfo)
+        fr.label_set("GSM modem information")
+        fr.size_hint_align_set(-1.0, 0.0)
+        box0.pack_end(fr)
+        fr.show()
+
+        sc = elementary.Scroller(self.wininfo)
+        sc.size_hint_weight_set(1.0, 1.0)
+        sc.size_hint_align_set(-1.0, -1.0)
+        box0.pack_end(sc)
+        sc.show()
+
+        cancelbt = elementary.Button(self.wininfo)
+        cancelbt.clicked = self.destroyInfo
+        cancelbt.label_set("Cancel")
+        cancelbt.size_hint_align_set(-1.0, 0.0)
+        cancelbt.show()
+        box0.pack_end(cancelbt)
+
+        box1 = elementary.Box(self.wininfo)
+        box1.size_hint_weight_set(1.0, -1.0)
+        sc.content_set(box1)
+        box1.show()
+
+        print "0"
+        i = self.gsmsc.gsmdevice_GetInfo()
+        print "1"
+        print str(i)
+        print "2"
+        for b in i:
+            print "3"
+            print "-"+str(b)
+            print "--"+str( i[b] )
+            fo = elementary.Frame(self.wininfo)
+            fo.label_set( str(b) )
+            fo.size_hint_align_set(-1.0, 0.0)
+            fo.show()
+            box1.pack_end(fo)
+
+            lab = elementary.Label(self.wininfo)
+            lab.label_set( str(i[b]) )
+            lab.size_hint_align_set(-1.0, 0.0)
+            lab.show()
+            box1.pack_end( lab )
+
+
+
+        self.opebt.label_set("GSM modem information")
+        self.wininfo.show()
+        
+
     def view(self, win):
         self.gsmsc = GSMstateContener()
         
@@ -215,6 +291,13 @@ class Gsm(module.AbstractModule):
             self.opebt.label_set("Operators" )
             self.opebt.size_hint_align_set(-1.0, 0.0)
             box1.pack_end(self.opebt)
+
+            self.infobt = elementary.Button(win)
+            self.infobt.clicked = self.informationbt
+            self.infobt.label_set("Modem information" )
+            self.infobt.size_hint_align_set(-1.0, 0.0)
+            self.infobt.show()
+            box1.pack_end(self.infobt)
 
             self.toggle0.changed = self.toggle0bt
 
