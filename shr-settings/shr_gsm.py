@@ -128,8 +128,20 @@ class Gsm(module.AbstractModule):
         self.opebt.label_set("Operators")
         self.winope.show()
 
+    def GSMmodGUIupdate(self):
+        self.ap = self.gsmsc.gsmdevice_getAntennaPower()
+
+        self.toggle0.state_set( self.ap )
+        if self.ap:
+            self.opebt.show()
+            self.toggle0.state_set( self.ap )
+        else:
+            self.opebt.hide()
+            self.toggle0.state_set( self.ap )
+
+
     def toggle0bt(self, obj, event, *args, **kargs):
-        if self.gsm_device_iface.GetAntennaPower():
+        if obj.state_get():
             print "GSM set off"
             self.gsm_device_iface.SetAntennaPower(0)
             self.opebt.hide()
@@ -139,39 +151,71 @@ class Gsm(module.AbstractModule):
             self.gsm_device_iface.SetAntennaPower(1)
             self.opebt.show()
             obj.state_set( 1 )
+        
+        self.GSMmodGUIupdate()
 
     def view(self, win):
-
-        DBusGMainLoop(set_as_default=True)
-        bus = dbus.SystemBus()
-        gsm_device_obj = bus.get_object( 'org.freesmartphone.ogsmd', '/org/freesmartphone/GSM/Device' )
-        gsm_network_iface = dbus.Interface(gsm_device_obj, 'org.freesmartphone.GSM.Network')
-        self.gsm_device_iface = dbus.Interface(gsm_device_obj, 'org.freesmartphone.GSM.Device')
-
-        box1 = elementary.Box(win)
-        gsmAntennaPowerState = self.gsm_device_iface.GetAntennaPower()
-        toggle0 = elementary.Toggle(win)
-        toggle0.label_set("GSM antenna:")
-        toggle0.size_hint_align_set(-1.0, 0.0)
-        toggle0.states_labels_set("On","Off")
-        toggle0.state_set( gsmAntennaPowerState )
-        toggle0.changed = self.toggle0bt
-        toggle0.show()
-        box1.pack_start(toggle0)
-
-
-        self.opebt = elementary.Button(win)
-        self.opebt.clicked = self.operatorsList
-        self.opebt.label_set("Operators")
-        self.opebt.size_hint_align_set(-1.0, 0.0)
-        if gsmAntennaPowerState:
-            self.opebt.show()
-        box1.pack_end(self.opebt)
-
+        self.gsmsc = GSMstateContener()
         
+        box1 = elementary.Box(win)
+        self.toggle0 = elementary.Toggle(win)
+        self.toggle0.label_set("GSM antenna:")
+        self.toggle0.size_hint_align_set(-1.0, 0.0)
+        self.toggle0.states_labels_set("On","Off")
+        self.toggle0.show()
+        box1.pack_start(self.toggle0)
+       
+        if self.gsmsc.dbus_getState():
 
+            self.opebt = elementary.Button(win)
+            self.opebt.clicked = self.operatorsList
+            self.opebt.label_set("Operators")
+            self.opebt.size_hint_align_set(-1.0, 0.0)
+            box1.pack_end(self.opebt)
+
+            self.toggle0.changed = self.toggle0bt
+
+            self.GSMmodGUIupdate()
+        else:
+            errlab = elementary.Label(win)
+            errlab.label_set("can't connect to dbus")
+            errlab.size_hint_align_set(-1.0, 0.0)
+            errlab.show()
+            box1.pack_end( errlab )
+            print "GSM view [info] can't connect to dbus"
+       
         return box1
     
+
+class GSMstateContener:
+    def __init__(self):
+        self.dbus_state = 0
+        try:
+            DBusGMainLoop(set_as_default=True)
+            bus = dbus.SystemBus()
+            gsm_device_obj = bus.get_object( 'org.freesmartphone.ogsmd', '/org/freesmartphone/GSM/Device' )
+            self.gsm_network_iface = dbus.Interface(gsm_device_obj, 'org.freesmartphone.GSM.Network')
+            self.gsm_device_iface = dbus.Interface(gsm_device_obj, 'org.freesmartphone.GSM.Device')
+            #test
+            self.gsm_device_iface.GetAntennaPower()
+            #test end
+            self.dbus_state = 1
+        except:
+            self.dbus_state = 0
+            print "GSM GSMstateContener [error] can't connect to dbus"
+
+    def dbus_getState(self):
+        return self.dbus_state
+
+    def gsmdevice_getAntennaPower(self):
+        if self.dbus_state==0:
+            return 0
+        else:
+            try:
+                tr = self.gsm_device_iface.GetAntennaPower()
+            except:
+                tr = 0
+            return tr
 
 if __name__ == "__main__":
     print "This is "+name()+" module for shr-settings."
