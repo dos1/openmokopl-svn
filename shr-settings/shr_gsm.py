@@ -20,6 +20,39 @@ class Button2( elementary.Button ):
     def get_opeNr( self ):
         return self.mOpeNr
 
+class GSMstateContener:
+    def __init__(self):
+        self.dbus_state = 0
+        try:
+            DBusGMainLoop(set_as_default=True)
+            bus = dbus.SystemBus()
+            gsm_device_obj = bus.get_object( 'org.freesmartphone.ogsmd', '/org/freesmartphone/GSM/Device' )
+            self.gsm_network_iface = dbus.Interface(gsm_device_obj, 'org.freesmartphone.GSM.Network')
+            self.gsm_device_iface = dbus.Interface(gsm_device_obj, 'org.freesmartphone.GSM.Device')
+            #test
+            self.gsm_device_iface.GetAntennaPower()
+            #test end
+            self.dbus_state = 1
+        except:
+            self.dbus_state = 0
+            print "GSM GSMstateContener [error] can't connect to dbus"
+
+    def dbus_getState(self):
+        return self.dbus_state
+
+    def gsmdevice_getAntennaPower(self):
+        if self.dbus_state==0:
+            return 0
+        else:
+            try:
+                tr = self.gsm_device_iface.GetAntennaPower()
+            except:
+                tr = 0
+            return tr
+    def gsmdevice_setAntennaPower(self, b):
+        if self.dbus_state==1:
+            self.gsm_device_iface.SetAntennaPower(b)
+
 class Gsm(module.AbstractModule):
     def name(self):
         return "GSM"
@@ -141,14 +174,14 @@ class Gsm(module.AbstractModule):
 
 
     def toggle0bt(self, obj, event, *args, **kargs):
-        if obj.state_get():
+        if self.gsmsc.gsmdevice_getAntennaPower():
             print "GSM set off"
-            self.gsm_device_iface.SetAntennaPower(0)
+            self.gsmsc.gsmdevice_setAntennaPower(0)
             self.opebt.hide()
             obj.state_set( 0 )
         else:
             print "GSM set on"
-            self.gsm_device_iface.SetAntennaPower(1)
+            self.gsmsc.gsmdevice_setAntennaPower(1)
             self.opebt.show()
             obj.state_set( 1 )
         
@@ -185,37 +218,7 @@ class Gsm(module.AbstractModule):
             print "GSM view [info] can't connect to dbus"
        
         return box1
-    
 
-class GSMstateContener:
-    def __init__(self):
-        self.dbus_state = 0
-        try:
-            DBusGMainLoop(set_as_default=True)
-            bus = dbus.SystemBus()
-            gsm_device_obj = bus.get_object( 'org.freesmartphone.ogsmd', '/org/freesmartphone/GSM/Device' )
-            self.gsm_network_iface = dbus.Interface(gsm_device_obj, 'org.freesmartphone.GSM.Network')
-            self.gsm_device_iface = dbus.Interface(gsm_device_obj, 'org.freesmartphone.GSM.Device')
-            #test
-            self.gsm_device_iface.GetAntennaPower()
-            #test end
-            self.dbus_state = 1
-        except:
-            self.dbus_state = 0
-            print "GSM GSMstateContener [error] can't connect to dbus"
-
-    def dbus_getState(self):
-        return self.dbus_state
-
-    def gsmdevice_getAntennaPower(self):
-        if self.dbus_state==0:
-            return 0
-        else:
-            try:
-                tr = self.gsm_device_iface.GetAntennaPower()
-            except:
-                tr = 0
-            return tr
 
 if __name__ == "__main__":
     print "This is "+name()+" module for shr-settings."
