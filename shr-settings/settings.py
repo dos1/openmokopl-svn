@@ -46,9 +46,9 @@ if __name__ == "__main__":
     fr.content_set(lb)
     lb.show()
 
-    toolbar = elementary.Toolbar(win)
-    box0.pack_start(toolbar)
-    toolbar.show()
+#    toolbar = elementary.Toolbar(win)
+#    box0.pack_start(toolbar)
+#    toolbar.show()
 
     sc = elementary.Scroller(win)
     sc.size_hint_weight_set(1.0, 1.0)

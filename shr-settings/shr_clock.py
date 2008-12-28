@@ -5,6 +5,7 @@ class Clock(module.AbstractModule):
         return "Date/time"
     def view(self, win):
         cl = elementary.Clock(win)
+        cl.show_seconds_set(True)
         return cl
 
 if __name__ == "__main__":
