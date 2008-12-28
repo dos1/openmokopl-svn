@@ -13,7 +13,6 @@ http://74.125.77.132/search?q=cache:lrCoc3DSa0gJ:www.freesmartphone.org/index.ph
 """
 
 class Button2( elementary.Button ):
-    mOpeNr = ""
     def set_opeNr( self, mOpeNr ):
         self.mOpeNr = mOpeNr
 
@@ -59,7 +58,7 @@ class GSMstateContener:
 
     def gsmnetwork_RegisterWithProvider(self, b):
         if self.dbus_state==1:
-            self.gsm_network_iface.RegisterWithProvider(int(b))
+            self.gsm_network_iface.RegisterWithProvider(b)
 
     def gsmnetwork_GetStatus(self):
         if self.dbus_state==1:
@@ -94,7 +93,7 @@ class Gsm(module.AbstractModule):
         
     def operatorSelect(self, obj, event, *args, **kargs):
         #os.popen("echo \"gsmnetwork.RegisterWithProvider( "+obj.get_opeNr()+" )\" | cli-framework", "r");
-        print "GSM operatorSelect [info] ["+obj.get_opeNr()+"]"
+        print "GSM operatorSelect [info] ["+str(obj.get_opeNr())+"]"
         self.gsmsc.gsmnetwork_RegisterWithProvider( obj.get_opeNr() )
         self.winope.hide()
         print "clik"
@@ -149,7 +148,7 @@ class Gsm(module.AbstractModule):
         print "GSM operatorsList [inf] get list"
         l = self.gsmsc.gsmnetwork_ListProviders()
         for i in l:
-            print "GSM operatorsList [inf] add operator to list - "+str(i[2])+" - "+str(i[1])
+            print "GSM operatorsList [inf] add operator to list - "+str(i[2])+" - "+str(i[1])+" - "+str(i[0])
             opeAvbt = Button2(self.winope)
             if str(i[1])=="current":
                 add = " [current]"
