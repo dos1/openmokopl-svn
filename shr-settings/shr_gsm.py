@@ -14,74 +14,96 @@ class Gsm(module.AbstractModule):
 
     def destroy(self, obj, event, *args, **kargs):
         print "DEBUG: window destroy callback called! kabum!"
+        #TODO - zamkniecie okna
+        self.winope.hide()
+        # to jest totalna proteza trzeba to poprawic
         
     def operatorSelect(self, obj, event, *args, **kargs):
+        print "Start query cli-framework\n-------"
+
+
         os.popen("echo \"gsmnetwork.RegisterWithProvider( "+obj.get_opeNr()+" )\" | cli-framework", "r");
+
+
+        print "-------\nEnd query cli-framework"
         print "set operator: "+obj.get_opeNr()
         #TODO - zamkniecie okna
+        self.winope.hide()
+        # to jest totalna proteza trzeba to poprawic
         print "clik"
 
     def operatorsList(self, obj, event, *args, **kargs):
+        self.opebt.label_set("Operators [search...]")
+        
         print "Operators list\nStart query cli-framework\n-------"
+
+
         self.operatorsList = os.popen("echo \"gsmnetwork.ListProviders()\" | cli-framework", "r");
-        #operatorsList = os.popen("cat /tmp/operators", "r");
+        #self.operatorsList = os.popen("cat /tmp/operators", "r");
+
+
         row = 1
         res = ""
         while 1:
-	  row+=1
-	  line = self.operatorsList.readline();
-	  if not line:
-	      break
-	  if row>=3:
-	      print str(row)+": >["+line+"]<"
-	      lineParse = line.replace(" ", "").replace(">>>", "").replace("[", "").replace("]", "").replace("),", ")")
-	      if len(lineParse) > 5:
-		res+= lineParse
+            row+=1
+            line = self.operatorsList.readline();
+            if not line:
+                break
+            if row>=2:
+                lineParse = line.replace(" ", "").replace(">>>", "").replace("[", "").replace("]", "").replace("),", ")")
+                if len(lineParse) > 5:
+                    res+= lineParse
+                    print lineParse
         print "-------\nEnd query cli-framework"
-        print "------res-\n"
-        print res
-        print "------res-\n"
 
-        winope = elementary.Window("listProviders", elementary.ELM_WIN_BASIC)
-        winope.title_set("List Providers")
-        winope.autodel_set(True)
+        self.winope = elementary.Window("listProviders", elementary.ELM_WIN_BASIC)
+        self.winope.title_set("List Providers")
+        self.winope.autodel_set(True)
 
-        box0 = elementary.Box(winope)
+        box0 = elementary.Box(self.winope)
         box0.size_hint_weight_set(1.0, 1.0)
-        winope.resize_object_add(box0)
+        self.winope.resize_object_add(box0)
         box0.show()
 
-        fr = elementary.Frame(winope)
+        fr = elementary.Frame(self.winope)
         fr.label_set("List Providers")
         fr.size_hint_align_set(-1.0, 0.0)
         box0.pack_start(fr)
         fr.show()
 
         resA = res.split("\n")
-
         btNr = 0
         for l in resA:
             line = l.split(",")
             if len(line)>2:
-                opeAvbt = Button2(winope)
+                opeAvbt = Button2(self.winope)
                 if line[1]=="'current'":
-                    add = " current "
+                    add = " [current]"
                 else :
                     add = "";
                 btNr+= 1
-                opeAvbt.label_set( line[0].replace("(","")+" "+line[2].replace("'","")+add )
+                opeAvbt.label_set( line[2].replace("'","")+add )
                 opeAvbt.set_opeNr( str(line[0].replace("(","")) )
                 opeAvbt.clicked = self.operatorSelect
                 opeAvbt.size_hint_align_set(-1.0, 0.0)
                 opeAvbt.show()
                 box0.pack_end(opeAvbt)
 
-        bg = elementary.Background(winope)
-        winope.resize_object_add(bg)
+        opeAvbt = elementary.Button(self.winope)
+        opeAvbt.label_set( "Cancel" )
+        opeAvbt.clicked = self.destroy
+        opeAvbt.size_hint_align_set(-1.0, 0.0)
+        opeAvbt.show()
+        box0.pack_end(opeAvbt)
+
+        bg = elementary.Background(self.winope)
+        self.winope.resize_object_add(bg)
         bg.size_hint_weight_set(1.0, 1.0)
         bg.show()
 
-        winope.show()
+        self.opebt.label_set("Operators")
+
+        self.winope.show()
 
     def view(self, win):
         box1 = elementary.Box(win)
@@ -93,12 +115,12 @@ class Gsm(module.AbstractModule):
         box1.pack_start(toggle0)
 
 
-        opebt = elementary.Button(win)
-        opebt.clicked = self.operatorsList
-        opebt.label_set("Operators")
-        opebt.size_hint_align_set(-1.0, 0.0)
-        opebt.show()
-        box1.pack_end(opebt)
+        self.opebt = elementary.Button(win)
+        self.opebt.clicked = self.operatorsList
+        self.opebt.label_set("Operators")
+        self.opebt.size_hint_align_set(-1.0, 0.0)
+        self.opebt.show()
+        box1.pack_end(self.opebt)
 
         toggle0.show()
 
