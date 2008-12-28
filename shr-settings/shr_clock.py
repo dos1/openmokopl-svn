@@ -7,7 +7,3 @@ class Clock(module.AbstractModule):
         cl = elementary.Clock(win)
         cl.show_seconds_set(True)
         return cl
-
-if __name__ == "__main__":
-    print "This is "+name()+" module for shr-settings."
-    exit(0)    

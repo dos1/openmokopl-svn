@@ -9,6 +9,3 @@ class Gprs(module.AbstractModule):
         la.label_set("GPRS connection configuration")
         return la
 
-if __name__ == "__main__":
-    print "This is "+name()+" module for shr-settings."
-    exit(0)    

@@ -39,23 +39,18 @@ class AbstractModule(object):
         return True
 
     u"""
-        This should return frame (elementary.box)with will
-        be displayed to user. I do not understand how it works so... :)
+        This should return elementary object (for example Box) with will
+        be displayed to user.
         Here is example code:
 
         def view(self, win):
             box1 = elementary.Box(win)
-
-	  toggle0 = elementary.Toggle(win)
+            toggle0 = elementary.Toggle(win)
             toggle0.label_set("GSM antenna:")
             toggle0.size_hint_align_set(-1.0, 0.0)
             toggle0.states_labels_set("On","Off")
-
             box1.pack_start(toggle0)
             return box1
     """
     def view(self, win):
         pass
-
-if __name__ == "__main__":
-    print "no! this shouldn't be executed like that!";

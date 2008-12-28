@@ -220,7 +220,3 @@ class Gsm(module.AbstractModule):
         return box1
 
 
-if __name__ == "__main__":
-    print "This is "+name()+" module for shr-settings."
-    exit(0)    
-

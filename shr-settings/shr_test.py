@@ -19,7 +19,3 @@ class Test(module.AbstractModule):
 
         return bt
 
-
-if __name__ == "__main__":
-    print "This is "+name()+" module for shr-settings."
-    exit(0)    
