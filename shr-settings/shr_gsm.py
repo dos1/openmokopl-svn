@@ -1,6 +1,6 @@
 
 import module, os, re, sys, elementary
-
+import threading
 import dbus
 from dbus.mainloop.glib import DBusGMainLoop
 
@@ -53,9 +53,28 @@ class GSMstateContener:
         if self.dbus_state==1:
             self.gsm_device_iface.SetAntennaPower(b)
 
-    def gsmnetwork_setRegisterWithProvider(self, b):
+    def gsmnetwork_ListProviders(self):
+        if self.dbus_state==1:
+            return self.gsm_network_iface.ListProviders()
+
+    def gsmnetwork_RegisterWithProvider(self, b):
         if self.dbus_state==1:
             self.gsm_network_iface.RegisterWithProvider(int(b))
+
+    def gsmnetwork_GetStatus(self):
+        if self.dbus_state==1:
+            return self.gsm_network_iface.GetStatus()
+
+    def gsmnetwork_GetStatusOperatorName(self):
+        if self.dbus_state==1:
+            stat = self.gsmnetwork_GetStatus()
+            try:
+                return str(stat[u'provider'])
+            except:
+                return ""
+        else:
+            return ""
+
 
 class Gsm(module.AbstractModule):
     def name(self):
@@ -64,37 +83,31 @@ class Gsm(module.AbstractModule):
     def destroy(self, obj, event, *args, **kargs):
         print "DEBUG: window destroy callback called! kabum!"
         #TODO - zamkniecie okna
+        try:
+            del self.thread
+            print "GSM destroy [inf] kill operator search thread"
+        except:
+            print "GSM destroy [inf] search thread not present"
+
         self.winope.hide()
         # to jest totalna proteza trzeba to poprawic
         
     def operatorSelect(self, obj, event, *args, **kargs):
         #os.popen("echo \"gsmnetwork.RegisterWithProvider( "+obj.get_opeNr()+" )\" | cli-framework", "r");
         print "GSM operatorSelect [info] ["+obj.get_opeNr()+"]"
-        self.gsmsc.gsmnetwork_setRegisterWithProvider( obj.get_opeNr() )
+        self.gsmsc.gsmnetwork_RegisterWithProvider( obj.get_opeNr() )
         self.winope.hide()
         print "clik"
 
+    def operatorsListbt(self, obj, event, *args, **kargs):
+        self.opebt.label_set("Operators [searching ... ]")
+
+        self.thread = threading.Thread(target=self.operatorsList)
+        self.thread.start()
+
+
     def operatorsList(self, obj, event, *args, **kargs):
-        self.opebt.label_set("Operators [search...]")
-        
-        print "Operators list\nStart query cli-framework\n-------"
-        self.operatorsList = os.popen("echo \"gsmnetwork.ListProviders()\" | cli-framework", "r");
-        #self.operatorsList = os.popen("cat /tmp/operators", "r");
-
-        row = 1
-        res = ""
-        while 1:
-            row+=1
-            line = self.operatorsList.readline();
-            if not line:
-                break
-            if row>=2:
-                lineParse = line.replace(" ", "").replace(">>>", "").replace("[", "").replace("]", "").replace("),", ")")
-                if len(lineParse) > 5:
-                    res+= lineParse
-                    print lineParse
-        print "-------\nEnd query cli-framework"
-
+        print "GSM operatorsList [inf]"
         self.winope = elementary.Window("listProviders", elementary.ELM_WIN_BASIC)
         self.winope.title_set("List Providers")
         self.winope.autodel_set(True)
@@ -133,24 +146,21 @@ class Gsm(module.AbstractModule):
         sc.content_set(box1)
         box1.show()
 
-
-        resA = res.split("\n")
-        btNr = 0
-        for l in resA:
-            line = l.split(",")
-            if len(line)>2:
-                opeAvbt = Button2(self.winope)
-                if line[1]=="'current'":
-                    add = " [current]"
-                else :
-                    add = "";
-                btNr+= 1
-                opeAvbt.label_set( line[2].replace("'","")+add )
-                opeAvbt.set_opeNr( str(line[0].replace("(","")) )
-                opeAvbt.clicked = self.operatorSelect
-                opeAvbt.size_hint_align_set(-1.0, 0.0)
-                opeAvbt.show()
-                box1.pack_end(opeAvbt)
+        print "GSM operatorsList [inf] get list"
+        l = self.gsmsc.gsmnetwork_ListProviders()
+        for i in l:
+            print "GSM operatorsList [inf] add operator to list - "+str(i[2])+" - "+str(i[1])
+            opeAvbt = Button2(self.winope)
+            if str(i[1])=="current":
+                add = " [current]"
+            else :
+                add = "";
+            opeAvbt.label_set( str(i[2])+add )
+            opeAvbt.set_opeNr( i[0] )
+            opeAvbt.clicked = self.operatorSelect
+            opeAvbt.size_hint_align_set(-1.0, 0.0)
+            opeAvbt.show()
+            box1.pack_end(opeAvbt)
 
         self.opebt.label_set("Operators")
         self.winope.show()
@@ -166,6 +176,7 @@ class Gsm(module.AbstractModule):
             self.opebt.hide()
             self.toggle0.state_set( self.ap )
 
+        self.opebt.label_set( self.gsmsc.gsmnetwork_GetStatusOperatorName()+" Operators" )
 
     def toggle0bt(self, obj, event, *args, **kargs):
         if self.gsmsc.gsmdevice_getAntennaPower():
@@ -178,7 +189,13 @@ class Gsm(module.AbstractModule):
             self.gsmsc.gsmdevice_setAntennaPower(1)
             self.opebt.show()
             obj.state_set( 1 )
-        
+
+        try:
+            del self.thread
+            print "GSM GSMmodGUIupdate [inf] kill operator search thread"
+        except:
+            print "GSM GSMmodGUIupdate [inf] search thread not present"
+
         self.GSMmodGUIupdate()
 
     def view(self, win):
@@ -196,7 +213,7 @@ class Gsm(module.AbstractModule):
 
             self.opebt = elementary.Button(win)
             self.opebt.clicked = self.operatorsList
-            self.opebt.label_set("Operators")
+            self.opebt.label_set("Operators" )
             self.opebt.size_hint_align_set(-1.0, 0.0)
             box1.pack_end(self.opebt)
 
