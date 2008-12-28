@@ -1,4 +1,16 @@
+
 import module, os, re, sys, elementary
+
+import dbus
+from dbus.mainloop.glib import DBusGMainLoop
+
+"""
+source
+- freesmartphone framework
+http://git.freesmartphone.org/?p=specs.git;a=blob_plain;f=html/org.freesmartphone.GSM.Device.html;hb=HEAD
+- dbus
+http://74.125.77.132/search?q=cache:lrCoc3DSa0gJ:www.freesmartphone.org/index.php/Tutorials/GSM_python+python+dbus+%22org.freesmartphone.ogsmd%22&hl=pl&ct=clnk&cd=3&gl=pl&client=firefox-a
+"""
 
 class Button2( elementary.Button ):
     mOpeNr = ""
@@ -116,13 +128,35 @@ class Gsm(module.AbstractModule):
         self.opebt.label_set("Operators")
         self.winope.show()
 
+    def toggle0bt(self, obj, event, *args, **kargs):
+        if self.gsm_device_iface.GetAntennaPower():
+            print "GSM set off"
+            self.gsm_device_iface.SetAntennaPower(0)
+            self.opebt.hide()
+            obj.state_set( 0 )
+        else:
+            print "GSM set on"
+            self.gsm_device_iface.SetAntennaPower(1)
+            self.opebt.show()
+            obj.state_set( 1 )
+
     def view(self, win):
+
+        DBusGMainLoop(set_as_default=True)
+        bus = dbus.SystemBus()
+        gsm_device_obj = bus.get_object( 'org.freesmartphone.ogsmd', '/org/freesmartphone/GSM/Device' )
+        gsm_network_iface = dbus.Interface(gsm_device_obj, 'org.freesmartphone.GSM.Network')
+        self.gsm_device_iface = dbus.Interface(gsm_device_obj, 'org.freesmartphone.GSM.Device')
+
         box1 = elementary.Box(win)
+        gsmAntennaPowerState = self.gsm_device_iface.GetAntennaPower()
         toggle0 = elementary.Toggle(win)
         toggle0.label_set("GSM antenna:")
-    #    toggle0.changed = totest
         toggle0.size_hint_align_set(-1.0, 0.0)
         toggle0.states_labels_set("On","Off")
+        toggle0.state_set( gsmAntennaPowerState )
+        toggle0.changed = self.toggle0bt
+        toggle0.show()
         box1.pack_start(toggle0)
 
 
@@ -130,12 +164,14 @@ class Gsm(module.AbstractModule):
         self.opebt.clicked = self.operatorsList
         self.opebt.label_set("Operators")
         self.opebt.size_hint_align_set(-1.0, 0.0)
-        self.opebt.show()
+        if gsmAntennaPowerState:
+            self.opebt.show()
         box1.pack_end(self.opebt)
 
-        toggle0.show()
+        
 
         return box1
+    
 
 if __name__ == "__main__":
     print "This is "+name()+" module for shr-settings."
