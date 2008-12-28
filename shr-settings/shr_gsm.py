@@ -53,6 +53,10 @@ class GSMstateContener:
         if self.dbus_state==1:
             self.gsm_device_iface.SetAntennaPower(b)
 
+    def gsmnetwork_setRegisterWithProvider(self, b):
+        if self.dbus_state==1:
+            self.gsm_network_iface.RegisterWithProvider(int(b))
+
 class Gsm(module.AbstractModule):
     def name(self):
         return "GSM"
@@ -64,28 +68,18 @@ class Gsm(module.AbstractModule):
         # to jest totalna proteza trzeba to poprawic
         
     def operatorSelect(self, obj, event, *args, **kargs):
-        print "Start query cli-framework\n-------"
-
-
-        os.popen("echo \"gsmnetwork.RegisterWithProvider( "+obj.get_opeNr()+" )\" | cli-framework", "r");
-
-
-        print "-------\nEnd query cli-framework"
-        print "set operator: "+obj.get_opeNr()
-        #TODO - zamkniecie okna
+        #os.popen("echo \"gsmnetwork.RegisterWithProvider( "+obj.get_opeNr()+" )\" | cli-framework", "r");
+        print "GSM operatorSelect [info] ["+obj.get_opeNr()+"]"
+        self.gsmsc.gsmnetwork_setRegisterWithProvider( obj.get_opeNr() )
         self.winope.hide()
-        # to jest totalna proteza trzeba to poprawic
         print "clik"
 
     def operatorsList(self, obj, event, *args, **kargs):
         self.opebt.label_set("Operators [search...]")
         
         print "Operators list\nStart query cli-framework\n-------"
-
-
         self.operatorsList = os.popen("echo \"gsmnetwork.ListProviders()\" | cli-framework", "r");
         #self.operatorsList = os.popen("cat /tmp/operators", "r");
-
 
         row = 1
         res = ""
