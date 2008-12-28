@@ -60,6 +60,11 @@ class Gsm(module.AbstractModule):
         self.winope.title_set("List Providers")
         self.winope.autodel_set(True)
 
+        self.bg = elementary.Background(self.winope)
+        self.winope.resize_object_add(self.bg)
+        self.bg.size_hint_weight_set(1.0, 1.0)
+        self.bg.show()
+
         box0 = elementary.Box(self.winope)
         box0.size_hint_weight_set(1.0, 1.0)
         self.winope.resize_object_add(box0)
@@ -68,13 +73,27 @@ class Gsm(module.AbstractModule):
         fr = elementary.Frame(self.winope)
         fr.label_set("List Providers")
         fr.size_hint_align_set(-1.0, 0.0)
-        box0.pack_start(fr)
+        box0.pack_end(fr)
         fr.show()
 
+        sc = elementary.Scroller(self.winope)
+        sc.size_hint_weight_set(1.0, 1.0)
+        sc.size_hint_align_set(-1.0, -1.0)
+        box0.pack_end(sc)
+        sc.show()
+
+        cancelbt = elementary.Button(self.winope)
+        cancelbt.clicked = self.destroy
+        cancelbt.label_set("Cancel")
+        cancelbt.size_hint_align_set(-1.0, 0.0)
+        cancelbt.show()
+        box0.pack_end(cancelbt)
+
         box1 = elementary.Box(self.winope)
-        box1.size_hint_weight_set(1.0, 1.0)
-	fr.content_set(box1)
+        box1.size_hint_weight_set(1.0, -1.0)
+        sc.content_set(box1)
         box1.show()
+
 
         resA = res.split("\n")
         btNr = 0
@@ -94,20 +113,7 @@ class Gsm(module.AbstractModule):
                 opeAvbt.show()
                 box1.pack_end(opeAvbt)
 
-        opeAvbt = elementary.Button(self.winope)
-        opeAvbt.label_set( "Cancel" )
-        opeAvbt.clicked = self.destroy
-        opeAvbt.size_hint_align_set(-1.0, 0.0)
-        opeAvbt.show()
-        box0.pack_end(opeAvbt)
-
-        bg = elementary.Background(self.winope)
-        self.winope.resize_object_add(bg)
-        bg.size_hint_weight_set(1.0, 1.0)
-        bg.show()
-
         self.opebt.label_set("Operators")
-
         self.winope.show()
 
     def view(self, win):
