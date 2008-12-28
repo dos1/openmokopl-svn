@@ -14,9 +14,6 @@ class Gsm(module.AbstractModule):
 
     def destroy(self, obj, event, *args, **kargs):
         print "DEBUG: window destroy callback called! kabum!"
-        #TODO - zamkniecie okna
-        self.winope.hide()
-        # to jest totalna proteza trzeba to poprawic
         
     def operatorSelect(self, obj, event, *args, **kargs):
         print "Start query cli-framework\n-------"
