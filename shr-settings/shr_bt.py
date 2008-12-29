@@ -40,9 +40,9 @@ class BtMstateContener:
     def setPower(self, b ):
         print "BT BtMstateContener setPower [inf] "+self.model
         if b==0:
-            print "stop /etc/init.d/bluetooth"
-            os.system("/etc/init.d/bluetooth stop")
-            time.sleep(1)
+            #print "stop /etc/init.d/bluetooth"
+            #os.system("/etc/init.d/bluetooth stop")
+            #time.sleep(1)
 
 
             print "reset"
@@ -64,9 +64,9 @@ class BtMstateContener:
                 print "reset"
                 os.system("echo "+str(b)+" > "+btModels[2]+"/reset")
 
-            time.sleep(1)
-            print "start /etc/init.d/bluetooth"
-            os.system("/etc/init.d/bluetooth start")
+            #time.sleep(1)
+            #print "start /etc/init.d/bluetooth"
+            #os.system("/etc/init.d/bluetooth start")
 
         
 
