@@ -183,7 +183,7 @@ class Gsm(module.AbstractModule):
             self.opebt.hide()
             self.toggle0.state_set( self.ap )
 
-        self.opebt.label_set( self.gsmsc.gsmnetwork_GetStatusOperatorName()+" Operators" )
+#        self.opela.label_set( self.gsmsc.gsmnetwork_GetStatusOperatorName() )
 
     def toggle0bt(self, obj, event, *args, **kargs):
         if self.gsmsc.gsmdevice_getAntennaPower():
@@ -269,7 +269,6 @@ class Gsm(module.AbstractModule):
 
 
 
-        self.opebt.label_set("GSM modem information")
         self.wininfo.show()
         
 
