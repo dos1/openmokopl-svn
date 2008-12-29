@@ -12,16 +12,6 @@ http://git.freesmartphone.org/?p=specs.git;a=blob_plain;f=html/org.freesmartphon
 http://74.125.77.132/search?q=cache:lrCoc3DSa0gJ:www.freesmartphone.org/index.php/Tutorials/GSM_python+python+dbus+%22org.freesmartphone.ogsmd%22&hl=pl&ct=clnk&cd=3&gl=pl&client=firefox-a
 - target :)
 http://shr-project.org/trac/wiki/Draft:SHRSettingsApp
-
-[main gui]
-    \-  [ GSM settings  ]
-        [ modem info    ] -\
-                            \-  [   GSM on/off  ]
-                                [   operator    ]   -\
-                                [   getStatus   ]     \- [ operator select ]
-
-
-
 """
 
 class Button2( elementary.Button ):
@@ -84,6 +74,7 @@ class GSMstateContener:
         if self.dbus_state==1:
             struct = self.gsmnetwork_GetStatus()
             return str( struct[u'provider'])
+
     def gsmnetwork_GetStatusOperatorName(self):
         if self.dbus_state==1:
             stat = self.gsmnetwork_GetStatus()
@@ -99,17 +90,23 @@ class Gsm(module.AbstractModule):
     def name(self):
         return "GSM"
 
+    def destroy(self, obj, event, *args, **kargs):
+        print "DEBUG: window destroy callback called! kabum!"
+        #TODO - zamkniecie okna
+        try:
+            del self.thread
+            print "GSM destroy [inf] kill operator search thread"
+        except:
+            print "GSM destroy [inf] search thread not present"
 
-
-    def goto_settingsbtClick(self, obj, event, *args, **kargs):
-        self.wininfo.hide()
         self.winope.hide()
+        # to jest totalna proteza trzeba to poprawic
     
-    def goto_infobtClick(self, obj, event, *args, **kargs):
-        self.winope.hide()
-
+    def destroyInfo(self, obj, event, *args, **kargs):
+        self.wininfo.hide()
 
     def operatorSelect(self, obj, event, *args, **kargs):
+        #os.popen("echo \"gsmnetwork.RegisterWithProvider( "+obj.get_opeNr()+" )\" | cli-framework", "r");
         print "GSM operatorSelect [info] ["+str(obj.get_opeNr())+"]"
         self.gsmsc.gsmnetwork_RegisterWithProvider( obj.get_opeNr() )
         self.winope.hide()
@@ -124,7 +121,7 @@ class Gsm(module.AbstractModule):
     def operatorsList(self, obj, event, *args, **kargs):
         print "GSM operatorsList [inf]"
         self.winope = elementary.Window("listProviders", elementary.ELM_WIN_BASIC)
-        self.winope.title_set("Operators list")
+        self.winope.title_set("List Providers")
         self.winope.autodel_set(True)
 
         self.bg = elementary.Background(self.winope)
@@ -138,7 +135,7 @@ class Gsm(module.AbstractModule):
         box0.show()
 
         fr = elementary.Frame(self.winope)
-        fr.label_set("Operators list")
+        fr.label_set("List Providers")
         fr.size_hint_align_set(-1.0, 0.0)
         box0.pack_end(fr)
         fr.show()
@@ -149,19 +146,12 @@ class Gsm(module.AbstractModule):
         box0.pack_end(sc)
         sc.show()
 
-        goto_infobt = elementary.Button(self.winope)
-        goto_infobt.clicked = self.goto_infobtClick
-        goto_infobt.label_set("GSM modem information")
-        goto_infobt.size_hint_align_set(-1.0, 0.0)
-        goto_infobt.show()
-        box0.pack_start(goto_infobt)
-
-        goto_settingsbt = elementary.Button(self.winope)
-        goto_settingsbt.clicked = self.goto_settingsbtClick
-        goto_settingsbt.label_set("Settings")
-        goto_settingsbt.size_hint_align_set(-1.0, 0.0)
-        goto_settingsbt.show()
-        box0.pack_start(goto_settingsbt)
+        cancelbt = elementary.Button(self.winope)
+        cancelbt.clicked = self.destroy
+        cancelbt.label_set("Cancel")
+        cancelbt.size_hint_align_set(-1.0, 0.0)
+        cancelbt.show()
+        box0.pack_end(cancelbt)
 
         box1 = elementary.Box(self.winope)
         box1.size_hint_weight_set(1.0, -1.0)
@@ -184,6 +174,7 @@ class Gsm(module.AbstractModule):
             opeAvbt.show()
             box1.pack_end(opeAvbt)
 
+        self.opebt.label_set("Operators")
         self.winope.show()
 
     def GSMmodGUIupdate(self):
@@ -247,6 +238,13 @@ class Gsm(module.AbstractModule):
         sc.size_hint_align_set(-1.0, -1.0)
         box0.pack_end(sc)
         sc.show()
+
+        cancelbt = elementary.Button(self.wininfo)
+        cancelbt.clicked = self.destroyInfo
+        cancelbt.label_set("Cancel")
+        cancelbt.size_hint_align_set(-1.0, 0.0)
+        cancelbt.show()
+        box0.pack_end(cancelbt)
 
         box1 = elementary.Box(self.wininfo)
         box1.size_hint_weight_set(1.0, -1.0)
@@ -315,14 +313,31 @@ class Gsm(module.AbstractModule):
         self.gsmsc = GSMstateContener()
         
         box1 = elementary.Box(win)
-        
+        self.toggle0 = elementary.Toggle(win)
+        self.toggle0.label_set("GSM antenna:")
+        self.toggle0.size_hint_align_set(-1.0, 0.0)
+        self.toggle0.states_labels_set("On","Off")
+        self.toggle0.show()
+        box1.pack_start(self.toggle0)
+       
         if self.gsmsc.dbus_getState():
+
+            self.opebt = elementary.Button(win)
+            self.opebt.clicked = self.operatorsList
+            self.opebt.label_set("Operators" )
+            self.opebt.size_hint_align_set(-1.0, 0.0)
+            box1.pack_end(self.opebt)
+
             self.infobt = elementary.Button(win)
             self.infobt.clicked = self.informationbt
-            self.infobt.label_set("GSM modem information" )
+            self.infobt.label_set("Modem information" )
             self.infobt.size_hint_align_set(-1.0, 0.0)
             self.infobt.show()
             box1.pack_end(self.infobt)
+
+            self.toggle0.changed = self.toggle0bt
+
+            self.GSMmodGUIupdate()
         else:
             errlab = elementary.Label(win)
             errlab.label_set("can't connect to dbus")
@@ -330,7 +345,8 @@ class Gsm(module.AbstractModule):
             errlab.show()
             box1.pack_end( errlab )
             print "GSM view [info] can't connect to dbus"
-
+       
         return box1
+
 
 
