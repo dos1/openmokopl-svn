@@ -5,6 +5,14 @@ class Profile(module.AbstractModule):
         return "Profile"
     
     def view(self, win):
+	boxh = elementary.Box(win)
+	boxh.horizontal_set(True)
         la = elementary.Label(win)
-        la.label_set("Current profile: default")
-        return la
+        la.label_set("Current profile:")
+	la.show()
+	boxh.pack_start(la)
+	self.cur = elementary.Label(win)
+	self.cur.label_set("default")
+	boxh.pack_end(self.cur)
+	self.cur.show()
+        return boxh
