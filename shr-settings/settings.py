@@ -69,11 +69,12 @@ if __name__ == "__main__":
     box1.show()
 
     #loading modules
-    import shr_gsm, shr_bt, shr_wifi, shr_clock, shr_profile, shr_misc, shr_test, shr_usb, shr_gprs
+    import shr_gsm, shr_bt, shr_wifi, shr_clock, shr_profile, shr_misc, shr_test, shr_usb, shr_gprs, shr_services
 
-    modules = [ shr_gsm.Gsm, shr_bt.Bt, shr_wifi.Wifi, shr_gprs.Gprs, shr_usb.Usb, shr_clock.Clock, shr_profile.Profile, shr_misc.Misc, shr_test.Test ]
+    modules = [ shr_gsm.Gsm, shr_bt.Bt, shr_wifi.Wifi, shr_gprs.Gprs, shr_usb.Usb, shr_clock.Clock, shr_profile.Profile, shr_services.Services, shr_misc.Misc, shr_test.Test ]
     for mod in modules:
         load_module(mod)
+
     #end of loading modules
 
     win.show()
