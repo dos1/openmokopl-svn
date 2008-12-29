@@ -65,10 +65,10 @@ class Services(module.AbstractModule):
         
         cancelbt = elementary.Button(self.winser)
         cancelbt.clicked = self.destroyInfo
-        cancelbt.label_set("Settings")
+        cancelbt.label_set("Close")
         cancelbt.size_hint_align_set(-1.0, 0.0)
         cancelbt.show()
-        box0.pack_start(cancelbt)
+        box0.pack_end(cancelbt)
 
         box1 = elementary.Box(self.winser)
         box1.size_hint_weight_set(1.0, -1.0)
@@ -82,7 +82,9 @@ class Services(module.AbstractModule):
         for i in servicesList:
             #how to make horizontal box?
             boxSSS = elementary.Box(self.winser)
-            boxSSS.size_hint_weight_set(1.0, -1.0)
+            boxSSS.horizontal_set(True)
+            boxSSS.size_hint_align_set(-1.0, 0.0)
+            
 
             startbt = ButtonServer(self.winser)
             startbt.set_osCmd("/etc/init.d/"+i+" start")
@@ -90,7 +92,7 @@ class Services(module.AbstractModule):
             startbt.label_set("start")
             startbt.size_hint_align_set(-1.0, 0.0)
             startbt.show()
-            boxSSS.pack_end(startbt)
+            boxSSS.pack_start(startbt)
             
             stopbt = ButtonServer(self.winser)
             stopbt.set_osCmd("/etc/init.d/"+i+" stop")
