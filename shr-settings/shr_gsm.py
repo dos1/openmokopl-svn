@@ -265,7 +265,7 @@ class Gsm(module.AbstractModule):
             lab.label_set( str(i[b]) )
             lab.size_hint_align_set(-1.0, 0.0)
             lab.show()
-            box1.pack_end( lab )
+            fo.content_set( lab )
 
 
 
