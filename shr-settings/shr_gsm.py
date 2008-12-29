@@ -238,26 +238,6 @@ class Gsm(module.AbstractModule):
         sc.content_set(box1)
         box1.show()
 
-        if self.gsmsc.dbus_getState():
-            self.opebt = elementary.Button(self.wininfo)
-            self.opebt.label_set("Operators list" )
-            self.opebt.clicked = self.operatorsList
-            self.opebt.size_hint_align_set(-1.0, 0.0)
-            box0.pack_start(self.opebt)
-
-            self.toggle0 = elementary.Toggle(self.wininfo)
-            self.toggle0.label_set("GSM antenna:")
-            self.toggle0.changed = self.toggle0bt
-            self.toggle0.size_hint_align_set(-1.0, 0.0)
-            self.toggle0.states_labels_set("On","Off")
-            self.toggle0.show()
-            box0.pack_start(self.toggle0)
-
-        
-
-        self.GSMmodGUIupdate()
-
-
         i = self.gsmsc.gsmnetwork_GetStatus()
         for b in i:
             fo = elementary.Frame(self.wininfo)
