@@ -246,15 +246,8 @@ class Gsm(module.AbstractModule):
         sc.content_set(box1)
         box1.show()
 
-        print "0"
         i = self.gsmsc.gsmdevice_GetInfo()
-        print "1"
-        print str(i)
-        print "2"
         for b in i:
-            print "3"
-            print "-"+str(b)
-            print "--"+str( i[b] )
             fo = elementary.Frame(self.wininfo)
             fo.label_set( str(b) )
             fo.size_hint_align_set(-1.0, 0.0)
