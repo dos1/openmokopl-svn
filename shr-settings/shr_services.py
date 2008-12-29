@@ -65,10 +65,10 @@ class Services(module.AbstractModule):
         
         cancelbt = elementary.Button(self.winser)
         cancelbt.clicked = self.destroyInfo
-        cancelbt.label_set("Cancel")
+        cancelbt.label_set("Settings")
         cancelbt.size_hint_align_set(-1.0, 0.0)
         cancelbt.show()
-        box0.pack_end(cancelbt)
+        box0.pack_start(cancelbt)
 
         box1 = elementary.Box(self.winser)
         box1.size_hint_weight_set(1.0, -1.0)
