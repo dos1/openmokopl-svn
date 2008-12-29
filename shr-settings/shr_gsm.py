@@ -90,21 +90,11 @@ class Gsm(module.AbstractModule):
     def name(self):
         return "GSM"
 
-    def destroy(self, obj, event, *args, **kargs):
-        print "DEBUG: window destroy callback called! kabum!"
-        #TODO - zamkniecie okna
-        try:
-            del self.thread
-            print "GSM destroy [inf] kill operator search thread"
-        except:
-            print "GSM destroy [inf] search thread not present"
-
-        self.winope.hide()
-        # to jest totalna proteza trzeba to poprawic
-    
-    def destroyInfo(self, obj, event, *args, **kargs):
+    def goto_settingsbtClick(self, obj, event, *args, **kargs):
         self.wininfo.hide()
-
+        self.winope.hide()
+        
+    
     def operatorSelect(self, obj, event, *args, **kargs):
         #os.popen("echo \"gsmnetwork.RegisterWithProvider( "+obj.get_opeNr()+" )\" | cli-framework", "r");
         print "GSM operatorSelect [info] ["+str(obj.get_opeNr())+"]"
@@ -113,8 +103,6 @@ class Gsm(module.AbstractModule):
         print "clik"
 
     def operatorsListbt(self, obj, event, *args, **kargs):
-        self.opebt.label_set("Operators [searching ... ]")
-
         self.thread = threading.Thread(target=self.operatorsList)
         self.thread.start()
 
@@ -147,7 +135,7 @@ class Gsm(module.AbstractModule):
         sc.show()
 
         cancelbt = elementary.Button(self.winope)
-        cancelbt.clicked = self.destroy
+        cancelbt.clicked = self.goto_settingsbtClick
         cancelbt.label_set("Cancel")
         cancelbt.size_hint_align_set(-1.0, 0.0)
         cancelbt.show()
@@ -174,7 +162,6 @@ class Gsm(module.AbstractModule):
             opeAvbt.show()
             box1.pack_end(opeAvbt)
 
-        self.opebt.label_set("Operators")
         self.winope.show()
 
     def GSMmodGUIupdate(self):
@@ -240,7 +227,7 @@ class Gsm(module.AbstractModule):
         sc.show()
 
         cancelbt = elementary.Button(self.wininfo)
-        cancelbt.clicked = self.destroyInfo
+        cancelbt.clicked = self.goto_settingsbtClick
         cancelbt.label_set("Cancel")
         cancelbt.size_hint_align_set(-1.0, 0.0)
         cancelbt.show()
@@ -266,12 +253,7 @@ class Gsm(module.AbstractModule):
             self.toggle0.show()
             box0.pack_start(self.toggle0)
 
-        goto_settingsbt = elementary.Button(self.wininfo)
-        goto_settingsbt.label_set("Settings")
-        goto_settingsbt.clicked = self.goto_settingsbtClick
-        goto_settingsbt.size_hint_align_set(-1.0, 0.0)
-        goto_settingsbt.show()
-        box0.pack_start(goto_settingsbt)
+        
 
         self.GSMmodGUIupdate()
 
