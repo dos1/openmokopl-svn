@@ -54,13 +54,15 @@ class Services(module.AbstractModule):
         box0.pack_end(sc)
         sc.show()
 
+        """
         reloadbt = elementary.Button(self.winser)
         reloadbt.clicked = self.reloadbtClick
         reloadbt.label_set("Reload")
         reloadbt.size_hint_align_set(-1.0, 0.0)
         reloadbt.show()
         box0.pack_end(reloadbt)
-
+        """
+        
         cancelbt = elementary.Button(self.winser)
         cancelbt.clicked = self.destroyInfo
         cancelbt.label_set("Cancel")
