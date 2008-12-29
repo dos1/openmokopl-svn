@@ -330,7 +330,6 @@ class Gsm(module.AbstractModule):
             errlab.show()
             box1.pack_end( errlab )
             print "GSM view [info] can't connect to dbus"
-            self.infobt.label_set("Modem information" )
 
         return box1
 
