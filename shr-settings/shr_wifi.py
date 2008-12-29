@@ -1,8 +1,14 @@
-import elementary, module
+import elementary, module, os
 
 class Wifi(module.AbstractModule):
     def name(self):
         return "WiFi"
+
+    def enabled(self):
+	if os.popen("cat /proc/cpuinfo | grep Hardware").read()=="Hardware	: GTA01\n":
+	    return 0
+	else:
+	    return 1
     
     def view(self, win):
         box1 = elementary.Box(win)
