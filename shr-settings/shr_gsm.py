@@ -7,7 +7,7 @@ from dbus.mainloop.glib import DBusGMainLoop
 """
 source
 - freesmartphone framework
-http://git.freesmartphone.org/?p=specs.git;a=blob_plain;f=html/org.freesmartphone.GSM.Device.html;hb=HEAD
+http://www.freesmartphone.org/index.php/Main_Page
 - dbus
 http://74.125.77.132/search?q=cache:lrCoc3DSa0gJ:www.freesmartphone.org/index.php/Tutorials/GSM_python+python+dbus+%22org.freesmartphone.ogsmd%22&hl=pl&ct=clnk&cd=3&gl=pl&client=firefox-a
 - target :)
