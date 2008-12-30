@@ -21,13 +21,21 @@ class Usb(module.AbstractModule):
 	    self.usbhost.SetPower(True)
 	obj.state_set(usbpower)
 
+    def enabled(self):
+        bus = dbus.SystemBus()
+        self.usbhost = getDbusObject (bus, "org.freesmartphone.odeviced", "/org/freesmartphone/Device/PowerControl/UsbHost","org.freesmartphone.Device.PowerControl")
+	usbpower = self.usbhost.GetPower()
+	if usbpower==0:
+	    return 1
+	elif usbpower==1:
+	    return 1
+	else:
+	    return 0
+
     def name(self):
         return "USB"
 
     def view(self, win):
-	bus = dbus.SystemBus()
-	self.usbhost = getDbusObject (bus, "org.freesmartphone.odeviced", "/org/freesmartphone/Device/PowerControl/UsbHost", "org.freesmartphone.Device.PowerControl")
-
         box1 = elementary.Box(win)
         self.toggle0 = elementary.Toggle(win)
         self.toggle0.label_set("USB mode:")
