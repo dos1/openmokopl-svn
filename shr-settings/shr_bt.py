@@ -53,7 +53,7 @@ class BtMstateContener:
 
 
             print "reset"
-            os.system("echo "+str(b)+" > "+btModels[2]+"/reset")
+            os.system("echo 0 > "+btModels[2]+"/reset")
 
             print "sleep"
             time.sleep(2)
@@ -70,7 +70,7 @@ class BtMstateContener:
                 time.sleep(2)
 
                 print "reset"
-                os.system("echo "+str(b)+" > "+btModels[2]+"/reset")
+                os.system("echo 0 > "+btModels[2]+"/reset")
 
             #time.sleep(1)
             #print "start /etc/init.d/bluetooth"
