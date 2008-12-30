@@ -9,8 +9,8 @@ import module, elementary, os
 
 """
 btModels = [ \
-"/sys/devices/platform/s3c2410-i2c/i2c-adapter/i2c-0/0-0008/neo1973-pm-bt.0/",
-"/sys/devices/platform/s3c2440-i2c/i2c-adapter/i2c-0/0-0008/neo1973-pm-bt.0/",
+"/sys/devices/platform/s3c2410-i2c/i2c-adapter/i2c-0/0-0008/neo1973-pm-bt.0",
+"/sys/devices/platform/s3c2440-i2c/i2c-adapter/i2c-0/0-0073/neo1973-pm-bt.0",
 "/sys/bus/platform/devices/neo1973-pm-bt.0"]
 
 class BtMstateContener:
@@ -28,6 +28,12 @@ class BtMstateContener:
             self.model = "gta01"
         except:
             print "BT BtMstateContener getModel [inf] not gta01"
+
+        try:
+            open(btModels[1]+"/power_on", "r")
+            self.model = "gta02"
+        except:
+            print "BT BtMstateContener getModel [inf] not gta02"
 
         try:
             open(btModels[1]+"/power_on", "r")
