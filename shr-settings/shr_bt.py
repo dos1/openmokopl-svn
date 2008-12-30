@@ -169,11 +169,11 @@ class Bt(module.AbstractModule):
         print str(s)
         if s:
             print "Turn off"
-            #self.toggle1.state_set(0)
+            self.toggle1.state_set(0)
             self.btmc.setVisibility(0)
         else:
             print "Turn on"
-            #self.toggle1.state_set(1)
+            self.toggle1.state_set(1)
             self.btmc.setVisibility(1)
         
 
