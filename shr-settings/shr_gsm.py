@@ -94,6 +94,7 @@ class Gsm(module.AbstractModule):
         self.wininfo.hide()
         self.winope.hide()
         
+        
     
     def operatorSelect(self, obj, event, *args, **kargs):
         #os.popen("echo \"gsmnetwork.RegisterWithProvider( "+obj.get_opeNr()+" )\" | cli-framework", "r");
@@ -269,46 +270,81 @@ class Gsm(module.AbstractModule):
 
 
         self.wininfo.show()
-        
+
+    def start_ophonekitd_btClick(self, obj, event, *args, **kargs):
+        os.system( "DISPLAY=:0 ophonekitd &" )
+
+
+
 
     def view(self, win):
+        self.win = win
         self.gsmsc = GSMstateContener()
         
-        box1 = elementary.Box(win)
-        self.toggle0 = elementary.Toggle(win)
-        self.toggle0.label_set("GSM antenna:")
-        self.toggle0.size_hint_align_set(-1.0, 0.0)
-        self.toggle0.states_labels_set("On","Off")
-        self.toggle0.show()
-        box1.pack_start(self.toggle0)
-       
+        self.box1 = elementary.Box(win)
+
         if self.gsmsc.dbus_getState():
+
+            self.toggle0 = elementary.Toggle(win)
+            self.toggle0.label_set("GSM antenna:")
+            self.toggle0.size_hint_align_set(-1.0, 0.0)
+            self.toggle0.states_labels_set("On","Off")
+            self.toggle0.show()
+            self.box1.pack_start(self.toggle0)
 
             self.opebt = elementary.Button(win)
             self.opebt.clicked = self.operatorsList
             self.opebt.label_set("Operators" )
             self.opebt.size_hint_align_set(-1.0, 0.0)
-            box1.pack_end(self.opebt)
+            self.box1.pack_end(self.opebt)
 
             self.infobt = elementary.Button(win)
             self.infobt.clicked = self.informationbt
             self.infobt.label_set("Modem information" )
             self.infobt.size_hint_align_set(-1.0, 0.0)
             self.infobt.show()
-            box1.pack_end(self.infobt)
+            self.box1.pack_end(self.infobt)
 
             self.toggle0.changed = self.toggle0bt
 
             self.GSMmodGUIupdate()
         else:
+            print "GSM view [info] can't connect to dbus"
             errlab = elementary.Label(win)
             errlab.label_set("can't connect to dbus")
             errlab.size_hint_align_set(-1.0, 0.0)
             errlab.show()
-            box1.pack_end( errlab )
-            print "GSM view [info] can't connect to dbus"
-       
-        return box1
+            self.box1.pack_end( errlab )
+
+
+            if os.popen("ps -A | grep ophonekitd").read() == "":
+                boxOp = elementary.Box(win)
+                boxOp.size_hint_weight_set(1.0, 1.0)
+                boxOp.size_hint_align_set(-1.0, 0.0)
+
+                label = elementary.Label(win)
+                label.label_set("In not running! Start it?")
+                label.size_hint_align_set(-1.0, 0.0)
+                label.show()
+                boxOp.pack_start( label )
+
+                startbt = elementary.Button(win)
+                startbt.clicked = self.start_ophonekitd_btClick
+                startbt.label_set("yes")
+                startbt.size_hint_align_set(-1.0, 0.0)
+                startbt.show()
+                boxOp.pack_end(startbt)
+
+                fo = elementary.Frame(win)
+                fo.label_set( "ophonekitd" )
+                fo.size_hint_align_set(-1.0, 0.0)
+                fo.show()
+                fo.content_set( boxOp )
+
+                boxOp.show()
+                self.box1.pack_end(fo)
+
+        return self.box1
 
 
 
