@@ -51,15 +51,16 @@ class BtMstateContener:
             #os.system("/etc/init.d/bluetooth stop")
             #time.sleep(1)
 
-
-            print "reset"
-            os.system("echo 1 > "+btModels[2]+"/reset")
-
-            print "sleep"
-            time.sleep(2)
-
             print "power_on"
             os.system("echo "+str(b)+" > "+btModels[2]+"/power_on")
+
+            print "sleep"
+            time.sleep(1)
+        
+            print "reset"
+            os.system("echo 1 > "+btModels[2]+"/reset")
+            
+
         else:
             print "BT BtMstateContener setPower [inf] turn on bt by sysfs"
             print "power_on"
@@ -67,7 +68,7 @@ class BtMstateContener:
 
             if self.model == "gta02":
                 print "sleep"
-                time.sleep(2)
+                time.sleep(1)
 
                 print "reset"
                 os.system("echo 0 > "+btModels[2]+"/reset")
