@@ -53,7 +53,7 @@ class BtMstateContener:
 
 
             print "reset"
-            os.system("echo 0 > "+btModels[2]+"/reset")
+            os.system("echo 1 > "+btModels[2]+"/reset")
 
             print "sleep"
             time.sleep(2)
