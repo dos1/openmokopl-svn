@@ -5,7 +5,7 @@ class Wifi(module.AbstractModule):
         return "WiFi"
 
     def enabled(self):
-	if os.popen("cat /proc/cpuinfo | grep Hardware").read()=="Hardware	: GTA01\n":
+	if os.popen("cat /proc/cpuinfo | grep Hardware |  awk '{ print $3 }'").read()=="GTA01\n":
 	    return 0
 	else:
 	    return 1
