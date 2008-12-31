@@ -7,7 +7,8 @@ build:
 	exit 0
 
 clean:
-	rm *.pyc *~ shr_settings_modules/*.pyc shr_settings_modules/*~
+	rm *.pyc *~ *.pyo \
+	shr_settings_modules/*.pyc shr_settings_modules/*~ shr_settings_modules/*.pyo
 
 install:
 	mkdir -p ${prefix}/
