@@ -103,6 +103,7 @@ class BtMstateContener:
             os.system("hciconfig hci0 piscan")
         else:
             print "hciconfig hci0 pscan"
+            os.system("hciconfig hci0 up")
             os.system("hciconfig hci0 pscan")
 
     def getVisibility(self):
