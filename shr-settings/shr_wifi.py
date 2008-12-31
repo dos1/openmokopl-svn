@@ -23,8 +23,12 @@ class Wifi(module.AbstractModule):
 
     def view(self, win):
         bus = dbus.SystemBus()
-        self.wifi = getDbusObject (bus, "org.freesmartphone.odeviced", "/org/freesmartphone/Device/PowerControl/WiFi", "org.freesmartphone.Device.PowerControl")
-
+	try:
+            self.wifi = getDbusObject (bus, "org.freesmartphone.odeviced", "/org/freesmartphone/Device/PowerControl/WiFi", "org.freesmartphone.Device.PowerControl")
+	except:
+	    label = elementary.Label(win)
+	    label.label_set("can't connect to dbus")
+	    return label
         box1 = elementary.Box(win)
         toggle0 = elementary.Toggle(win)
         toggle0.label_set("WiFi radio:")

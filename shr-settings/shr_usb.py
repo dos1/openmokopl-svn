@@ -23,8 +23,8 @@ class Usb(module.AbstractModule):
 
     def enabled(self):
         bus = dbus.SystemBus()
-        self.usbhost = getDbusObject (bus, "org.freesmartphone.odeviced", "/org/freesmartphone/Device/PowerControl/UsbHost","org.freesmartphone.Device.PowerControl")
 	try:
+            self.usbhost = getDbusObject (bus, "org.freesmartphone.odeviced", "/org/freesmartphone/Device/PowerControl/UsbHost","org.freesmartphone.Device.PowerControl")
 	    usbpower = self.usbhost.GetPower()
 	    return 1
 	except:
