@@ -1,13 +1,13 @@
 [Desktop Entry]
+Version=1.0
+Encoding=UTF-8
 Name=shr-settings
 TryExec=shr-settings
 GenericName=Shr settings
 Comment=Settings of Openmoko Phone and ophonekitd
-StartupNotify=false
+StartupNotify=true
 Exec=shr-settings
-Icon=shr_settings
 Terminal=false
 Type=Application
-Categories=Settings;
-Categories=Office;
+Categories=Settings;Office;
 Icon=shr_settings.png
