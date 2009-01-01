@@ -64,25 +64,18 @@ class Pm(module.AbstractModule):
         self.apml.label_set( os.popen("apm").read().replace("\n","") )
         vol = "1234"
         temp = "1234"
-
-        #vol
-        #gta01
-        try:
-            vol = open("/sys/devices/platform/s3c2410-i2c/i2c-adapter/i2c-0/0-0008/battvolt","r").readline().replace("\n","")
-            temp = open("/sys/devices/platform/s3c2410-i2c/i2c-adapter/i2c-0/0-0008/battemp","r").readline().replace("\n","")
-        except:
-            print "not gta01"
-           
-            #gta02
-            try:
-                vol = open("/sys/devices/platform/s3c2440-i2c/i2c-adapter/i2c-0/0-0073/battvolt","r").readline().replace("\n","")
-                temp = open("/sys/devices/platform/s3c2440-i2c/i2c-adapter/i2c-0/0-0073/battemp","r").readline().replace("\n","")
-            except:
-                print "not gta02"
+        cur = "1234"
 
 
-        self.voll.label_set("voltage: "+str(vol)[0]+"."+str(vol)[1]+str(vol)[2]+str(vol)[3]+"V")
-        self.templ.label_set("temp: "+str(temp)+"'C")
+        vol =  open("/sys/class/power_supply/bat-th-gta01/voltage_now","r").readline().replace("\n","")
+        temp = open("/sys/class/power_supply/bat-th-gta01/temp","r").readline().replace("\n","")
+        cur =  int(open("/sys/class/power_supply/bat-th-gta01/current_now","r").readline().replace("\n",""))/1000
+        sta = open("/sys/class/power_supply/bat-th-gta01/status","r").readline().replace("\n","")
+
+        self.voll.label_set("Voltage: "+str(vol)[0]+"."+str(vol)[1]+str(vol)[2]+str(vol)[3]+" V")
+        self.templ.label_set("Temperature: "+str(temp)[0]+str(temp)[1]+"."+str(temp)[2]+" 'C")
+        self.curl.label_set("Current: "+str(cur)+" mA")
+        self.stal.label_set("Status: "+sta)
 
     def refreshbtClick(self, obj, event):
         self.refreshAct()
@@ -122,7 +115,11 @@ class Pm(module.AbstractModule):
         box1p = elementary.Box(win)
         box1p.size_hint_weight_set(1.0, 1.0)
         box1p.size_hint_align_set(-1.0, 0.0)
-        
+
+        self.stal = elementary.Label(win)
+    	self.stal.size_hint_align_set(-1.0, 0.0)
+    	self.stal.show()
+    	box1p.pack_start(self.stal)
 
         self.voll = elementary.Label(win)
     	self.voll.size_hint_align_set(-1.0, 0.0)
@@ -133,6 +130,11 @@ class Pm(module.AbstractModule):
     	self.templ.size_hint_align_set(-1.0, 0.0)
     	self.templ.show()
     	box1p.pack_start(self.templ)
+
+        self.curl = elementary.Label(win)
+    	self.curl.size_hint_align_set(-1.0, 0.0)
+    	self.curl.show()
+    	box1p.pack_start(self.curl)
 
         fo = elementary.Frame(win)
         fo.label_set( "battery:" )
