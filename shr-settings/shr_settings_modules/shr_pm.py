@@ -66,11 +66,16 @@ class Pm(module.AbstractModule):
         temp = "1234"
         cur = "1234"
 
-
-        vol =  open("/sys/class/power_supply/bat-th-gta01/voltage_now","r").readline().replace("\n","")
-        temp = open("/sys/class/power_supply/bat-th-gta01/temp","r").readline().replace("\n","")
-        cur =  int(open("/sys/class/power_supply/bat-th-gta01/current_now","r").readline().replace("\n",""))/1000
-        sta = open("/sys/class/power_supply/bat-th-gta01/status","r").readline().replace("\n","")
+        try:
+            vol =  open("/sys/class/power_supply/bat-th-gta01/voltage_now","r").readline().replace("\n","")
+            temp = open("/sys/class/power_supply/bat-th-gta01/temp","r").readline().replace("\n","")
+            cur =  int(open("/sys/class/power_supply/bat-th-gta01/current_now","r").readline().replace("\n",""))/1000
+            sta = open("/sys/class/power_supply/bat-th-gta01/status","r").readline().replace("\n","")
+        except:
+            vol =  open("/sys/class/power_supply/bat-th-gta02/voltage_now","r").readline().replace("\n","")
+            temp = open("/sys/class/power_supply/bat-th-gta02/temp","r").readline().replace("\n","")
+            cur =  int(open("/sys/class/power_supply/bat-th-gta02/current_now","r").readline().replace("\n",""))/1000
+            sta = open("/sys/class/power_supply/bat-th-gta02/status","r").readline().replace("\n","")
 
         self.voll.label_set("Voltage: "+str(vol)[0]+"."+str(vol)[1]+str(vol)[2]+str(vol)[3]+" V")
         self.templ.label_set("Temperature: "+str(temp)[0]+str(temp)[1]+"."+str(temp)[2]+" 'C")
