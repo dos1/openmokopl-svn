@@ -62,16 +62,24 @@ class Pm(module.AbstractModule):
             
     def refreshAct(self):
         self.apml.label_set( os.popen("apm").read().replace("\n","") )
-
+        vol = 1234
+        temp = 1234
 
         #vol
         #gta01
-        vol = open("/sys/devices/platform/s3c2410-i2c/i2c-adapter/i2c-0/0-0008/battvolt","r").readline().replace("\n","")
-        temp = open("/sys/devices/platform/s3c2410-i2c/i2c-adapter/i2c-0/0-0008/battemp","r").readline().replace("\n","")
+        try:
+            vol = open("/sys/devices/platform/s3c2410-i2c/i2c-adapter/i2c-0/0-0008/battvolt","r").readline().replace("\n","")
+            temp = open("/sys/devices/platform/s3c2410-i2c/i2c-adapter/i2c-0/0-0008/battemp","r").readline().replace("\n","")
+        except:
+            print "not gta01"
         if vol == "":
             #gta02
-            vol = open("/sys/devices/platform/s3c2440-i2c/i2c-adapter/i2c-0/0-0073/battvolt","r").readline().replace("\n","")
-            temp = open("/sys/devices/platform/s3c2440-i2c/i2c-adapter/i2c-0/0-0073/battemp","r").readline().replace("\n","")
+            try:
+                vol = open("/sys/devices/platform/s3c2440-i2c/i2c-adapter/i2c-0/0-0073/battvolt","r").readline().replace("\n","")
+                temp = open("/sys/devices/platform/s3c2440-i2c/i2c-adapter/i2c-0/0-0073/battemp","r").readline().replace("\n","")
+            except:
+            print "not gta02"
+
 
         self.voll.label_set("voltage: "+str(vol[0])+"."+str(vol[1])+str(vol[2])+str(vol[3])+"V")
         self.templ.label_set("temp: "+str(temp)+"'C")
