@@ -67,15 +67,12 @@ class Pm(module.AbstractModule):
         cur = "1234"
 
         try:
-            vol =  open("/sys/class/power_supply/bat-th-gta01/voltage_now","r").readline().replace("\n","")
-            temp = open("/sys/class/power_supply/bat-th-gta01/temp","r").readline().replace("\n","")
-            cur =  int(open("/sys/class/power_supply/bat-th-gta01/current_now","r").readline().replace("\n",""))/1000
-            sta = open("/sys/class/power_supply/bat-th-gta01/status","r").readline().replace("\n","")
+            vol =  os.popen("cat /sys/class/power_supply/ba*/voltage_now").readline().replace("\n","")
+            temp = os.popen("cat /sys/class/power_supply/ba*/temp").readline().replace("\n","")
+            cur =  int(os.popen("cat /sys/class/power_supply/ba*/current_now").readline().replace("\n",""))/1000
+            sta = os.popen("cat /sys/class/power_supply/ba*/status").readline().replace("\n","")
         except:
-            vol =  open("/sys/class/power_supply/bat-th-gta02/voltage_now","r").readline().replace("\n","")
-            temp = open("/sys/class/power_supply/bat-th-gta02/temp","r").readline().replace("\n","")
-            cur =  int(open("/sys/class/power_supply/bat-th-gta02/current_now","r").readline().replace("\n",""))/1000
-            sta = open("/sys/class/power_supply/bat-th-gta02/status","r").readline().replace("\n","")
+            print ":("
 
         self.voll.label_set("Voltage: "+str(vol)[0]+"."+str(vol)[1]+str(vol)[2]+str(vol)[3]+" V")
         self.templ.label_set("Temperature: "+str(temp)[0]+str(temp)[1]+"."+str(temp)[2]+" 'C")
