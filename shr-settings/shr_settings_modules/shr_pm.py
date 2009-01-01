@@ -63,7 +63,7 @@ class Pm(module.AbstractModule):
     def refreshAct(self):
         self.apml.label_set( os.popen("apm").read().replace("\n","") )
         vol = "1234"
-        temp = "1234""
+        temp = "1234"
 
         #vol
         #gta01
