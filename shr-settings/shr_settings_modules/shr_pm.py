@@ -72,7 +72,7 @@ class Pm(module.AbstractModule):
             temp = open("/sys/devices/platform/s3c2410-i2c/i2c-adapter/i2c-0/0-0008/battemp","r").readline().replace("\n","")
         except:
             print "not gta01"
-        if vol == "":
+           
             #gta02
             try:
                 vol = open("/sys/devices/platform/s3c2440-i2c/i2c-adapter/i2c-0/0-0073/battvolt","r").readline().replace("\n","")
