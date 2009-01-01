@@ -70,10 +70,11 @@ if __name__ == "__main__":
     box1.show()
 
     #loading modules
-    from shr_settings_modules import shr_gsm, shr_bt, shr_wifi, shr_gprs, shr_usb, shr_clock, shr_profile, shr_services, shr_misc, shr_test
+    from shr_settings_modules import shr_gsm, shr_pm, shr_bt, shr_wifi, shr_gprs, shr_usb, shr_clock, shr_profile, shr_services, shr_misc, shr_test
 
     modules = [ shr_gsm.Gsm, 
-                shr_bt.Bt, 
+                shr_pm.Pm,
+                shr_bt.Bt,
                 shr_wifi.Wifi, 
                 shr_gprs.Gprs,
                 shr_usb.Usb,
