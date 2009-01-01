@@ -21,7 +21,7 @@ dist = setup( name='shr-settings',
     packages=['shr_settings_modules'],
     scripts=['shr-settings'],
     data_files=[('applications', ['data/shr-settings.desktop']),
-	('images', ['data/shr_settings.png'])
+	('pixmaps', ['data/shr_settings.png'])
         ]
 )
 
