@@ -78,7 +78,7 @@ class Pm(module.AbstractModule):
                 vol = open("/sys/devices/platform/s3c2440-i2c/i2c-adapter/i2c-0/0-0073/battvolt","r").readline().replace("\n","")
                 temp = open("/sys/devices/platform/s3c2440-i2c/i2c-adapter/i2c-0/0-0073/battemp","r").readline().replace("\n","")
             except:
-            print "not gta02"
+                print "not gta02"
 
 
         self.voll.label_set("voltage: "+str(vol[0])+"."+str(vol[1])+str(vol[2])+str(vol[3])+"V")
