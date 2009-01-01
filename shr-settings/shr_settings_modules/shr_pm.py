@@ -81,7 +81,7 @@ class Pm(module.AbstractModule):
                 print "not gta02"
 
 
-        self.voll.label_set("voltage: "+str(vol[0])+"."+str(vol[1])+str(vol[2])+str(vol[3])+"V")
+        self.voll.label_set("voltage: "+str(vol)[0]+"."+str(vol)[1]+str(vol)[2]+str(vol)[3]+"V")
         self.templ.label_set("temp: "+str(temp)+"'C")
 
     def refreshbtClick(self, obj, event):
