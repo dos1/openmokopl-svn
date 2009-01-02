@@ -9,14 +9,14 @@ class Pm(module.AbstractModule):
         return "Power"
 
     def poweroffbtClick(self, obj, event):
-        iface = get_usage_iface()
+        iface = self.get_usage_iface()
         if iface:
             iface.Shutdown()
         else:
             print "Shutdown by dbus cmd error"
 
     def restartbtClick(self, obj, event):
-        iface = get_usage_iface()
+        iface = self.get_usage_iface()
         if iface:
             iface.Reboot()
         else:
@@ -39,7 +39,7 @@ class Pm(module.AbstractModule):
         
 
     def suspendbtClick(self, obj, event):
-        iface = get_usage_iface()
+        iface = self.get_usage_iface()
 
         if os.popen("cat /proc/cpuinfo | grep GTA01").read() == "GTA01\n":
             print "suspend for GTA01"
