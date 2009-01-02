@@ -1,5 +1,5 @@
 
-import module, os, re, sys, elementary
+import module, os, re, sys, elementary, ecore
 import threading
 import dbus
 from dbus.mainloop.glib import DBusGMainLoop
@@ -67,10 +67,10 @@ class Pm(module.AbstractModule):
         cur = "1234"
 
         try:
-            vol =  os.popen("cat /sys/class/power_supply/ba*/voltage_now").readline().replace("\n","")
-            temp = os.popen("cat /sys/class/power_supply/ba*/temp").readline().replace("\n","")
-            cur =  int(os.popen("cat /sys/class/power_supply/ba*/current_now").readline().replace("\n",""))/1000
-            sta = os.popen("cat /sys/class/power_supply/ba*/status").readline().replace("\n","")
+            vol =  os.popen("cat /sys/class/power_sup*ly/bat*/voltage_now").readline().replace("\n","")
+            temp = os.popen("cat /sys/class/power_sup*ly/bat*/temp").readline().replace("\n","")
+            cur =  int(os.popen("cat /sys/class/power_su*ply/bat*/current_now").readline().replace("\n",""))/1000
+            sta = os.popen("cat /sys/class/power_su*ply/bat*/status").readline().replace("\n","")
         except:
             print ":("
 
@@ -79,8 +79,7 @@ class Pm(module.AbstractModule):
         self.curl.label_set("Current: "+str(cur)+" mA")
         self.stal.label_set("Status: "+sta)
 
-    def refreshbtClick(self, obj, event):
-        self.refreshAct()
+        ecore.timer_add( 2.3, self.refreshAct)
 
     def view(self, win):
         self.win = win
@@ -96,12 +95,6 @@ class Pm(module.AbstractModule):
     	self.apml.size_hint_align_set(-1.0, 0.0)
     	self.apml.show()
     	boxOp.pack_start(self.apml)
-
-    	self.apml = elementary.Label(win)
-    	self.apml.size_hint_align_set(-1.0, 0.0)
-    	self.apml.show()
-    	boxOp.pack_start(self.apml)
-
 
         fo = elementary.Frame(win)
         fo.label_set( "apm:" )
@@ -148,17 +141,7 @@ class Pm(module.AbstractModule):
         self.box1.pack_end(fo)
 
 
-        startbt = elementary.Button(win)
-        startbt.clicked = self.refreshbtClick
-        startbt.label_set("refresh")
-        startbt.size_hint_align_set(-1.0, 0.0)
-        startbt.show()
-        self.box1.pack_end(startbt)
-
-
         self.refreshAct()
-
-
 
 
 
@@ -198,10 +181,7 @@ class Pm(module.AbstractModule):
         self.box1.pack_end(fo)
 
 
-
-
-
-
+        
         return self.box1
 
 
