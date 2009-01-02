@@ -2,8 +2,8 @@
 import elementary
 import edje
 import evas
-import e_dbus
 import dbus
+import e_dbus
 
 def load_module(module, win, dbus):
     mod = module(win, dbus);
