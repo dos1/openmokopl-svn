@@ -154,7 +154,10 @@ class Bt(module.AbstractModule):
             self.toggle0.state_set( 0 )
 
     def toggle0Click(self, obj, event, *args, **kargs):
-        if self.btmc.getPower():
+#        if self.btmc.getPower():
+	if self.btmc.getPower()==obj.state_get():
+		return 0
+	if obj.state_get()==0:
             print "Bt toggle0Click BT set OFF"
             self.btmc.setPower( 0 )
             self.toggle1.hide()
@@ -168,15 +171,18 @@ class Bt(module.AbstractModule):
 
     def toggle1Click(self, obj, event, *args, **kargs):
         print "BT toggle1Cleck set Visibility"
-        s = self.btmc.getVisibility()
-        print str(s)
-        if s:
+	if self.btmc.getVisibility()==obj.state_get():
+		return 0
+#        s = self.btmc.getVisibility()
+#        print str(s)
+#        if s:
+	if obj.state_get()==0:
             print "Turn off"
-            self.toggle1.state_set(0)
+#            self.toggle1.state_set(0)
             self.btmc.setVisibility(0)
         else:
             print "Turn on"
-            self.toggle1.state_set(1)
+#            self.toggle1.state_set(1)
             self.btmc.setVisibility(1)
         
 
@@ -189,7 +195,7 @@ class Bt(module.AbstractModule):
         if self.btmc.getModel=="":
             label =elementary.Label(self.window)
             label.label_set("can't find file in sysfs")
-            label.toggle0.size_hint_align_set(-1.0, 0.0)
+            label.size_hint_align_set(-1.0, 0.0)
             label.show()
             box1.pack_start(label)
         else:

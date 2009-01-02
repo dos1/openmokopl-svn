@@ -178,16 +178,18 @@ class Gsm(module.AbstractModule):
 #        self.opela.label_set( self.gsmsc.gsmnetwork_GetStatusOperatorName() )
 
     def toggle0bt(self, obj, event, *args, **kargs):
-        if self.gsmsc.gsmdevice_getAntennaPower():
+        if self.gsmsc.gsmdevice_getAntennaPower()==obj.state_get():
+		return 0
+	if obj.state_get()==0:
             print "GSM set off"
             self.gsmsc.gsmdevice_setAntennaPower(0)
             self.opebt.hide()
-            obj.state_set( 0 )
+#            obj.state_set( 0 )
         else:
             print "GSM set on"
             self.gsmsc.gsmdevice_setAntennaPower(1)
             self.opebt.show()
-            obj.state_set( 1 )
+#            obj.state_set( 1 )
 
         try:
             del self.thread

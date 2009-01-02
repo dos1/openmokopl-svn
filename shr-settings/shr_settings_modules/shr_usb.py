@@ -8,8 +8,10 @@ class Usb(module.AbstractModule):
     name = "USB"
 
     def mode_handle(self, obj, event):
-        #if obj.state_get():
-	usbpower = self.usbhost.GetPower()
+	if self.usbhost.GetPower()!=obj.state_get():
+		return 0
+        usbpower=obj.state_get()
+	#usbpower = self.usbhost.GetPower()
         if usbpower:
             self.toggle1.label_set("Device mode:")
             self.toggle1.states_labels_set("Ethernet","Mass storage")
@@ -20,12 +22,12 @@ class Usb(module.AbstractModule):
             self.toggle1.states_labels_set("Yes","No")
             self.toggle1.state_set(1)
 	    self.usbhost.SetPower(True)
-	obj.state_set(usbpower)
+	#obj.state_set(usbpower)
 
     def isEnabled(self):
 	try:
             self.usbhost = getDbusObject (self.dbus, "org.freesmartphone.odeviced", "/org/freesmartphone/Device/PowerControl/UsbHost","org.freesmartphone.Device.PowerControl")
-	    usbpower = self.usbhost.GetPower()
+	    self.usbpower = self.usbhost.GetPower()
 	    return 1
 	except:
 	    return 0
@@ -38,8 +40,7 @@ class Usb(module.AbstractModule):
         self.toggle0.states_labels_set("Device","Host")
 	self.toggle0.state_set(1)
         self.toggle0.changed = self.mode_handle
-	usbstate = self.usbhost.GetPower()
-	self.toggle0.state_set(not(usbstate))
+	self.toggle0.state_set(not(self.usbpower))
         box1.pack_start(self.toggle0)
         self.toggle0.show()
 
@@ -51,7 +52,7 @@ class Usb(module.AbstractModule):
         box1.pack_end(self.toggle1)
         self.toggle1.show()
 
-	if usbstate:
+	if self.usbpower:
             self.toggle1.label_set("Host powered:")
             self.toggle1.states_labels_set("Yes","No")
             self.toggle1.state_set(1)

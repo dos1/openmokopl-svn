@@ -15,9 +15,12 @@ class Wifi(module.AbstractModule):
     
     def power_handle(self, obj, event):
         #if obj.state_get():
-        wifipower = self.wifi.GetPower()
-        self.wifi.SetPower(not(wifipower))
-        obj.state_set(not(wifipower))
+#        wifipower = self.wifi.GetPower()
+#        self.wifi.SetPower(not(wifipower))
+	if self.wifi.GetPower()==obj.state_get():
+		return 0
+	self.wifi.SetPower(obj.state_get())
+#        obj.state_set(not(wifipower))
 
 
     def createView(self):
