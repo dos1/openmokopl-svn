@@ -2,6 +2,7 @@
 import module, os, re, sys, elementary
 import threading
 import dbus
+from dbus.mainloop.glib import DBusGMainLoop
 
 """
 source
@@ -24,11 +25,13 @@ class GSMstateContener:
     def __init__(self):
         self.dbus_state = 0
         try:
-            gsm_device_obj = self.dbus.get_object( 'org.freesmartphone.ogsmd', '/org/freesmartphone/GSM/Device' )
+            DBusGMainLoop(set_as_default=True)
+            bus = dbus.SystemBus()
+            gsm_device_obj = bus.get_object( 'org.freesmartphone.ogsmd', '/org/freesmartphone/GSM/Device' )
             self.gsm_network_iface = dbus.Interface(gsm_device_obj, 'org.freesmartphone.GSM.Network')
             self.gsm_device_iface = dbus.Interface(gsm_device_obj, 'org.freesmartphone.GSM.Device')
             #test
-            self.gsm_device_iface.GetAntennaPower()
+            #self.gsm_device_iface.GetAntennaPower()
             #test end
             self.dbus_state = 1
         except:
