@@ -1,11 +1,10 @@
 import elementary, module
 
 class Misc(module.AbstractModule):
-    def name(self):
-        return "Miscellaneous"
+    name = "Miscellaneous"
     
-    def view(self, win):
-        la = elementary.Label(win)
+    def createView(self):
+        la = elementary.Label(self.window)
         la.label_set("Suspend, dim time and etc.")
         return la
 

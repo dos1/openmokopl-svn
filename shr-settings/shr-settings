@@ -2,19 +2,25 @@
 import elementary
 import edje
 import evas
+import e_dbus
+import dbus
 
-def load_module(module):
-    mod = module();
-    if mod.enabled():
+def load_module(module, win, dbus):
+    mod = module(win, dbus);
+    if mod.isEnabled():
         frame = elementary.Frame(win)
-        frame.label_set(mod.name()+" settings")
+        
+        frame.label_set(mod.getName()+" settings")
         box1.pack_end(frame)
         frame.size_hint_align_set(-1.0, 0.0)
         frame.show()
 
-        cont = mod.view(win)
-        frame.content_set(cont)
-        cont.show()
+        cont = mod.createView()
+        if cont != None:
+            frame.content_set(cont)
+            cont.show()
+        else:
+            print " error! module %s method createView() return's nothing!" % mod
 
 def destroy(obj, event, *args, **kargs):
     print "DEBUG: window destroy callback called! kabum!"
@@ -25,7 +31,13 @@ if __name__ == "__main__":
     win = elementary.Window("settings", elementary.ELM_WIN_BASIC)
     win.title_set("Settings")
     win.destroy = destroy
-    
+
+    #dbus init:
+    #as in exposure.py:
+    mainloop = e_dbus.DBusEcoreMainLoop()
+    #dbus_session = dbus.SessionBus(mainloop=self.mainloop) - we don't need atm
+    dbus_system = dbus.SystemBus(mainloop=mainloop)
+
     bg = elementary.Background(win)
     win.resize_object_add(bg)
     bg.size_hint_weight_set(1.0, 1.0)
@@ -72,10 +84,10 @@ if __name__ == "__main__":
     #loading modules
     from shr_settings_modules import shr_gsm, shr_pm, shr_bt, shr_wifi, shr_gprs, shr_usb, shr_clock, shr_profile, shr_services, shr_misc, shr_test
 
-    modules = [ shr_gsm.Gsm, 
+    modules = [ shr_gsm.Gsm,
                 shr_pm.Pm,
                 shr_bt.Bt,
-                shr_wifi.Wifi, 
+                shr_wifi.Wifi,
                 shr_gprs.Gprs,
                 shr_usb.Usb,
                 shr_clock.Clock,
@@ -85,7 +97,8 @@ if __name__ == "__main__":
                 shr_test.Test
               ]
     for mod in modules:
-        load_module(mod)
+        print "loading %s" % mod
+        load_module(mod, win, dbus_system)
 
     #end of loading modules
 

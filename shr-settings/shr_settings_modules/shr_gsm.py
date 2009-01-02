@@ -2,7 +2,6 @@
 import module, os, re, sys, elementary
 import threading
 import dbus
-from dbus.mainloop.glib import DBusGMainLoop
 
 """
 source
@@ -25,9 +24,7 @@ class GSMstateContener:
     def __init__(self):
         self.dbus_state = 0
         try:
-            DBusGMainLoop(set_as_default=True)
-            bus = dbus.SystemBus()
-            gsm_device_obj = bus.get_object( 'org.freesmartphone.ogsmd', '/org/freesmartphone/GSM/Device' )
+            gsm_device_obj = self.dbus.get_object( 'org.freesmartphone.ogsmd', '/org/freesmartphone/GSM/Device' )
             self.gsm_network_iface = dbus.Interface(gsm_device_obj, 'org.freesmartphone.GSM.Network')
             self.gsm_device_iface = dbus.Interface(gsm_device_obj, 'org.freesmartphone.GSM.Device')
             #test
@@ -87,8 +84,7 @@ class GSMstateContener:
 
 
 class Gsm(module.AbstractModule):
-    def name(self):
-        return "GSM"
+    name = "GSM"
 
     def goto_settingsbtClick(self, obj, event, *args, **kargs):
         self.wininfo.hide()
@@ -277,28 +273,27 @@ class Gsm(module.AbstractModule):
 
 
 
-    def view(self, win):
-        self.win = win
+    def createView(self):
         self.gsmsc = GSMstateContener()
         
-        self.box1 = elementary.Box(win)
+        self.box1 = elementary.Box(self.window)
 
         if self.gsmsc.dbus_getState():
 
-            self.toggle0 = elementary.Toggle(win)
+            self.toggle0 = elementary.Toggle(self.window)
             self.toggle0.label_set("GSM antenna:")
             self.toggle0.size_hint_align_set(-1.0, 0.0)
             self.toggle0.states_labels_set("On","Off")
             self.toggle0.show()
             self.box1.pack_start(self.toggle0)
 
-            self.opebt = elementary.Button(win)
+            self.opebt = elementary.Button(self.window)
             self.opebt.clicked = self.operatorsList
             self.opebt.label_set("Operators" )
             self.opebt.size_hint_align_set(-1.0, 0.0)
             self.box1.pack_end(self.opebt)
 
-            self.infobt = elementary.Button(win)
+            self.infobt = elementary.Button(self.window)
             self.infobt.clicked = self.informationbt
             self.infobt.label_set("Modem information" )
             self.infobt.size_hint_align_set(-1.0, 0.0)
@@ -310,7 +305,7 @@ class Gsm(module.AbstractModule):
             self.GSMmodGUIupdate()
         else:
             print "GSM view [info] can't connect to dbus"
-            errlab = elementary.Label(win)
+            errlab = elementary.Label(self.window)
             errlab.label_set("can't connect to dbus")
             errlab.size_hint_align_set(-1.0, 0.0)
             errlab.show()
@@ -318,24 +313,24 @@ class Gsm(module.AbstractModule):
 
 
             if os.popen("ps -A | grep ophonekitd").read() == "":
-                boxOp = elementary.Box(win)
+                boxOp = elementary.Box(self.window)
                 boxOp.size_hint_weight_set(1.0, 1.0)
                 boxOp.size_hint_align_set(-1.0, 0.0)
 
-                label = elementary.Label(win)
+                label = elementary.Label(self.window)
                 label.label_set("In not running! Start it?")
                 label.size_hint_align_set(-1.0, 0.0)
                 label.show()
                 boxOp.pack_start( label )
 
-                startbt = elementary.Button(win)
+                startbt = elementary.Button(self.window)
                 startbt.clicked = self.start_ophonekitd_btClick
                 startbt.label_set("yes")
                 startbt.size_hint_align_set(-1.0, 0.0)
                 startbt.show()
                 boxOp.pack_end(startbt)
 
-                fo = elementary.Frame(win)
+                fo = elementary.Frame(self.window)
                 fo.label_set( "ophonekitd" )
                 fo.size_hint_align_set(-1.0, 0.0)
                 fo.show()

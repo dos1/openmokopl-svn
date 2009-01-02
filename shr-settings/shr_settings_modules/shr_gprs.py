@@ -1,11 +1,11 @@
-import elementary, module
+import elementary
+import module
 
 class Gprs(module.AbstractModule):
-    def name(self):
-        return "GPRS"
+    name = "GPRS"
     
-    def view(self, win):
-        la = elementary.Label(win)
+    def createView(self):
+        la = elementary.Label(self.window)
         la.label_set("GPRS connection configuration")
         return la
 

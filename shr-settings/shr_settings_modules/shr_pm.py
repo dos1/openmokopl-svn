@@ -2,11 +2,9 @@
 import module, os, re, sys, elementary, ecore
 import threading
 import dbus
-from dbus.mainloop.glib import DBusGMainLoop
 
 class Pm(module.AbstractModule):
-    def name(self):
-        return "Power"
+    name = "Power"
 
     def poweroffbtClick(self, obj, event):
         iface = self.get_usage_iface()
@@ -24,9 +22,7 @@ class Pm(module.AbstractModule):
 
     def get_usage_iface(self):
         try:
-            DBusGMainLoop(set_as_default=True)
-            bus = dbus.SystemBus()
-            usage_obj = bus.get_object( 'org.freesmartphone.ousaged', '/org/freesmartphone/Usage' )
+            usage_obj = self.dbus.get_object( 'org.freesmartphone.ousaged', '/org/freesmartphone/Usage' )
             return dbus.Interface(usage_obj, 'org.freesmartphone.Usage')
             
             #self.usage_iface.Suspend()
@@ -73,33 +69,34 @@ class Pm(module.AbstractModule):
             cur =  int(os.popen("cat /sys/class/power_su*ply/bat*/current_now").readline().replace("\n",""))/1000
             sta = os.popen("cat /sys/class/power_su*ply/bat*/status").readline().replace("\n","")
             cap = os.popen("cat /sys/class/power_su*ply/bat*/capacity").readline().replace("\n","")
+
+            self.voll.label_set("Voltage: "+str(vol)[0]+"."+str(vol)[1]+str(vol)[2]+str(vol)[3]+" V")
+            self.templ.label_set("Temperature: "+str(temp)[0]+str(temp)[1]+"."+str(temp)[2]+" 'C")
+            self.curl.label_set("Current: "+str(cur)+" mA")
+            self.stal.label_set("Status: "+sta)
+            self.capl.label_set("Capacity: "+cap+" %")
+
+            #FIXME: if it does not work.. we should try again?
+            ecore.timer_add( 2.3, self.refreshAct)
+
         except:
             print ":("
 
-        self.voll.label_set("Voltage: "+str(vol)[0]+"."+str(vol)[1]+str(vol)[2]+str(vol)[3]+" V")
-        self.templ.label_set("Temperature: "+str(temp)[0]+str(temp)[1]+"."+str(temp)[2]+" 'C")
-        self.curl.label_set("Current: "+str(cur)+" mA")
-        self.stal.label_set("Status: "+sta)
-        self.capl.label_set("Capacity: "+cap+" %")
-
-        ecore.timer_add( 2.3, self.refreshAct)
-
-    def view(self, win):
-        self.win = win
+    def createView(self):
         
-        self.box1 = elementary.Box(win)
+        self.box1 = elementary.Box(self.window)
 
 
-        boxOp = elementary.Box(win)
+        boxOp = elementary.Box(self.window)
         boxOp.size_hint_weight_set(1.0, 1.0)
         boxOp.size_hint_align_set(-1.0, 0.0)
 
-        self.apml = elementary.Label(win)
+        self.apml = elementary.Label(self.window)
     	self.apml.size_hint_align_set(-1.0, 0.0)
     	self.apml.show()
     	boxOp.pack_start(self.apml)
 
-        fo = elementary.Frame(win)
+        fo = elementary.Frame(self.window)
         fo.label_set( "apm:" )
         fo.size_hint_align_set(-1.0, 0.0)
         fo.show()
@@ -110,36 +107,36 @@ class Pm(module.AbstractModule):
 
 
 
-        box1p = elementary.Box(win)
+        box1p = elementary.Box(self.window)
         box1p.size_hint_weight_set(1.0, 1.0)
         box1p.size_hint_align_set(-1.0, 0.0)
 
-        self.stal = elementary.Label(win)
+        self.stal = elementary.Label(self.window)
     	self.stal.size_hint_align_set(-1.0, 0.0)
     	self.stal.show()
     	box1p.pack_start(self.stal)
 
-        self.voll = elementary.Label(win)
+        self.voll = elementary.Label(self.window)
     	self.voll.size_hint_align_set(-1.0, 0.0)
     	self.voll.show()
     	box1p.pack_start(self.voll)
 
-        self.templ = elementary.Label(win)
+        self.templ = elementary.Label(self.window)
     	self.templ.size_hint_align_set(-1.0, 0.0)
     	self.templ.show()
     	box1p.pack_start(self.templ)
 
-        self.curl = elementary.Label(win)
+        self.curl = elementary.Label(self.window)
     	self.curl.size_hint_align_set(-1.0, 0.0)
     	self.curl.show()
     	box1p.pack_start(self.curl)
 
-        self.capl = elementary.Label(win)
+        self.capl = elementary.Label(self.window)
     	self.capl.size_hint_align_set(-1.0, 0.0)
     	self.capl.show()
     	box1p.pack_start(self.capl)
 
-        fo = elementary.Frame(win)
+        fo = elementary.Frame(self.window)
         fo.label_set( "battery:" )
         fo.size_hint_align_set(-1.0, 0.0)
         fo.show()
@@ -153,25 +150,25 @@ class Pm(module.AbstractModule):
 
 
 
-        box2p = elementary.Box(win)
+        box2p = elementary.Box(self.window)
         box2p.size_hint_weight_set(1.0, 1.0)
         box2p.size_hint_align_set(-1.0, 0.0)
 
-        poweroffbt = elementary.Button(win)
+        poweroffbt = elementary.Button(self.window)
         poweroffbt.clicked = self.suspendbtClick
         poweroffbt.label_set("power off")
         poweroffbt.size_hint_align_set(-1.0, 0.0)
         poweroffbt.show()
         box2p.pack_end(poweroffbt)
 
-        restartbt = elementary.Button(win)
+        restartbt = elementary.Button(self.window)
         restartbt.clicked = self.restartbtClick
         restartbt.label_set("restart")
         restartbt.size_hint_align_set(-1.0, 0.0)
         restartbt.show()
         box2p.pack_end(restartbt)
 
-        suspendbt = elementary.Button(win)
+        suspendbt = elementary.Button(self.window)
         suspendbt.clicked = self.suspendbtClick
         suspendbt.label_set("suspend")
         suspendbt.size_hint_align_set(-1.0, 0.0)
@@ -179,7 +176,7 @@ class Pm(module.AbstractModule):
         box2p.pack_end(suspendbt)
 
 
-        fo = elementary.Frame(win)
+        fo = elementary.Frame(self.window)
         fo.label_set( "actions:" )
         fo.size_hint_align_set(-1.0, 0.0)
         fo.show()

@@ -5,6 +5,7 @@ def getDbusObject (bus, busname , objectpath , interface):
         return dbus.Interface(dbusObject, dbus_interface=interface)
 
 class Usb(module.AbstractModule):
+    name = "USB"
 
     def mode_handle(self, obj, event):
         #if obj.state_get():
@@ -21,21 +22,17 @@ class Usb(module.AbstractModule):
 	    self.usbhost.SetPower(True)
 	obj.state_set(usbpower)
 
-    def enabled(self):
-        bus = dbus.SystemBus()
+    def isEnabled(self):
 	try:
-            self.usbhost = getDbusObject (bus, "org.freesmartphone.odeviced", "/org/freesmartphone/Device/PowerControl/UsbHost","org.freesmartphone.Device.PowerControl")
+            self.usbhost = getDbusObject (self.dbus, "org.freesmartphone.odeviced", "/org/freesmartphone/Device/PowerControl/UsbHost","org.freesmartphone.Device.PowerControl")
 	    usbpower = self.usbhost.GetPower()
 	    return 1
 	except:
 	    return 0
 
-    def name(self):
-        return "USB"
-
-    def view(self, win):
-        box1 = elementary.Box(win)
-        self.toggle0 = elementary.Toggle(win)
+    def createView(self):
+        box1 = elementary.Box(self.window)
+        self.toggle0 = elementary.Toggle(self.window)
         self.toggle0.label_set("USB mode:")
         self.toggle0.size_hint_align_set(-1.0, 0.0)
         self.toggle0.states_labels_set("Device","Host")
@@ -46,7 +43,7 @@ class Usb(module.AbstractModule):
         box1.pack_start(self.toggle0)
         self.toggle0.show()
 
-	self.toggle1 = elementary.Toggle(win)
+	self.toggle1 = elementary.Toggle(self.window)
 	self.toggle1.label_set("Device mode:")
 	self.toggle1.size_hint_align_set(-1.0, 0.0)
         self.toggle1.states_labels_set("Ethernet","Mass storage")

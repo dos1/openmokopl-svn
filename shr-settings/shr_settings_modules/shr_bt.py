@@ -1,5 +1,7 @@
 import time
-import module, elementary, os
+import module
+import elementary
+import os
 
 """
 - gta01
@@ -133,8 +135,8 @@ class BtMstateContener:
 
 
 class Bt(module.AbstractModule):
-    def name(self):
-        return "Bluetooth"
+    name = "Bluetooth"
+    section = "Connectivity"
 
     def BtmodGUIupdate(self):
         s = self.btmc.getPower()
@@ -178,20 +180,20 @@ class Bt(module.AbstractModule):
             self.btmc.setVisibility(1)
         
 
-    def view(self, win):
+    def createView(self):
         self.btmc = BtMstateContener()
         vi = self.btmc.getVisibility()
 
-        box1 = elementary.Box(win)
+        box1 = elementary.Box(self.window)
 
         if self.btmc.getModel=="":
-            label =elementary.Label(win)
+            label =elementary.Label(self.window)
             label.label_set("can't find file in sysfs")
             label.toggle0.size_hint_align_set(-1.0, 0.0)
             label.show()
             box1.pack_start(label)
         else:
-            self.toggle0 = elementary.Toggle(win)
+            self.toggle0 = elementary.Toggle(self.window)
             self.toggle0.label_set("Bluetooth radio:")
             self.toggle0.size_hint_align_set(-1.0, 0.0)
             self.toggle0.states_labels_set("On","Off")
@@ -199,7 +201,7 @@ class Bt(module.AbstractModule):
             self.toggle0.show()
             self.toggle0.changed = self.toggle0Click
 
-            self.toggle1 = elementary.Toggle(win)
+            self.toggle1 = elementary.Toggle(self.window)
             self.toggle1.label_set("Visibility")
             self.toggle1.size_hint_align_set(-1.0, 0.0)
             self.toggle1.states_labels_set("On","Off")

@@ -10,6 +10,7 @@ class ButtonServer( elementary.Button ):
         return self.osCmd
 
 class Services(module.AbstractModule):
+    name = "Services"
 
     def reloadbtClick(self, obj, event, *args, **kargs):
         self.winser.hide()
@@ -172,16 +173,12 @@ class Services(module.AbstractModule):
 
         self.winser.show()
 
-
-    def name(self):
-        return "Services"
-
-    def view(self, win):
+    def createView(self):
         self.editable = False
 
-        box0 = elementary.Box(win)
+        box0 = elementary.Box(self.window)
 
-        sssbt = elementary.Button(win)
+        sssbt = elementary.Button(self.window)
         sssbt.label_set("start | stop")
         sssbt.size_hint_align_set(-1.0, 0.0)
         sssbt.clicked = self.sssbtClick
