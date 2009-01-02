@@ -65,12 +65,14 @@ class Pm(module.AbstractModule):
         vol = "1234"
         temp = "1234"
         cur = "1234"
+        cap = "100"
 
         try:
             vol =  os.popen("cat /sys/class/power_sup*ly/bat*/voltage_now").readline().replace("\n","")
             temp = os.popen("cat /sys/class/power_sup*ly/bat*/temp").readline().replace("\n","")
             cur =  int(os.popen("cat /sys/class/power_su*ply/bat*/current_now").readline().replace("\n",""))/1000
             sta = os.popen("cat /sys/class/power_su*ply/bat*/status").readline().replace("\n","")
+            cap = os.popen("cat /sys/class/power_su*ply/bat*/capacity").readline().replace("\n","")
         except:
             print ":("
 
@@ -78,6 +80,7 @@ class Pm(module.AbstractModule):
         self.templ.label_set("Temperature: "+str(temp)[0]+str(temp)[1]+"."+str(temp)[2]+" 'C")
         self.curl.label_set("Current: "+str(cur)+" mA")
         self.stal.label_set("Status: "+sta)
+        self.capl.label_set("Capacity: "+cap+" %")
 
         ecore.timer_add( 2.3, self.refreshAct)
 
@@ -130,6 +133,11 @@ class Pm(module.AbstractModule):
     	self.curl.size_hint_align_set(-1.0, 0.0)
     	self.curl.show()
     	box1p.pack_start(self.curl)
+
+        self.capl = elementary.Label(win)
+    	self.capl.size_hint_align_set(-1.0, 0.0)
+    	self.capl.show()
+    	box1p.pack_start(self.capl)
 
         fo = elementary.Frame(win)
         fo.label_set( "battery:" )
