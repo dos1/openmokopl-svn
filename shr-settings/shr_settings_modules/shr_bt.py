@@ -1,6 +1,6 @@
 import time
 import module
-import elementary
+import elementary, ecore
 import os
 
 """
@@ -153,6 +153,8 @@ class Bt(module.AbstractModule):
             self.toggle1.hide()
             self.toggle0.state_set( 0 )
 
+        ecore.timer_add( 5.4, self.BtmodGUIupdate)
+
     def toggle0Click(self, obj, event, *args, **kargs):
 #        if self.btmc.getPower():
 	if self.btmc.getPower()==obj.state_get():
@@ -167,7 +169,7 @@ class Bt(module.AbstractModule):
             self.toggle1.show()
 
         
-        self.BtmodGUIupdate()
+        
 
     def toggle1Click(self, obj, event, *args, **kargs):
         print "BT toggle1Cleck set Visibility"
