@@ -1,10 +1,10 @@
 [Desktop Entry]
 Version=1.0
 Encoding=UTF-8
-Name=SHR Settings
+Name=Settings
 TryExec=shr-settings
-GenericName=Shr settings
-Comment=Settings of SHR based Openmoko Phone
+GenericName=SHR Settings
+Comment=Settings of SHR based Openmoko phone
 StartupNotify=true
 Exec=shr-settings
 Terminal=false
