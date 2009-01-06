@@ -107,12 +107,14 @@ class Timeouts(module.AbstractModule):
                 if i != "avake" :
                     boxS = elementary.Box(self.window)
                     boxS.horizontal_set(True)
-                    boxS.size_hint_align_set(-1.0, 0.0)
+                    boxS.size_hint_align_set(-1.0, 0.5)
+                    boxS.size_hint_weight_set(1.0, 1.0)
 
 
                     namel = elementary.Label(self.window)
-                    namel.size_hint_align_set(0.0, 0.0)
-                    namel.label_set(str(i)+": ")
+                    namel.size_hint_align_set(-1.0, -1.0)
+                    namel.size_hint_weight_set(1.0, 1.0)
+                    namel.label_set(str(i).replace("_"," ")+": ")
                     namel.show()
                     boxS.pack_start(namel)
 
@@ -120,7 +122,7 @@ class Timeouts(module.AbstractModule):
                     value = self.timeouts[i]
 
                     valuel = elementary.Label(self.window)
-                    valuel.size_hint_align_set(-1.0, 0.0)
+                    valuel.size_hint_align_set(0.0, 0.0)
                     valuel.label_set(str(self.timeouts[i]))
                     valuel.show()
 
