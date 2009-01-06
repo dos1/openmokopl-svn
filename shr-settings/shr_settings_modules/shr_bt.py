@@ -45,6 +45,21 @@ class BtMstateContener:
 
         print "BT BtMstateContener getModel [inf] device is ? "+self.model
 
+    def getService(self):
+        ser = os.popen("ps -A | grep hci").read().replace("\n","")
+        if ser != "":
+            return 1
+        else:
+            return 0
+
+    def getServiceObex(self):
+        ser = os.popen("ps -A | grep obexftpd").read().replace("\n","")
+        if ser != "":
+            return 1
+        else:
+            return 0
+        
+
     def setPower(self, b ):
         print "BT BtMstateContener setPower [inf] "+self.model
         if b==0:
@@ -141,17 +156,31 @@ class Bt(module.AbstractModule):
     def BtmodGUIupdate(self):
         s = self.btmc.getPower()
         v = self.btmc.getVisibility()
-        print "BT BtmodGUIupdate [info] s"+str(s)+"; v"+str(v)
+        ser = self.btmc.getService()
+        obex = self.btmc.getServiceObex()
+        print "BT BtmodGUIupdate [info] power:"+str(s)+"; visibility:"+str(v)+" services:"+str(ser)+" obxeftpd:"+str(obex)
         if s == 1:
             self.toggle1.show()
             if v:
                 self.toggle1.state_set(1)
             else:
                 self.toggle1.state_set(0)
+
+            if ser:
+                self.toggle2.state_set(1)
+            else:
+                self.toggle2.state_set(0)
+
             self.toggle0.state_set( 1 )
+
+            self.toggle2.show()
         else:
             self.toggle1.hide()
+            self.toggle2.hide()
             self.toggle0.state_set( 0 )
+
+        self.toggle3.state_set( obex )
+
 
         ecore.timer_add( 5.4, self.BtmodGUIupdate)
 
@@ -173,20 +202,47 @@ class Bt(module.AbstractModule):
 
     def toggle1Click(self, obj, event, *args, **kargs):
         print "BT toggle1Cleck set Visibility"
-	if self.btmc.getVisibility()==obj.state_get():
-		return 0
-#        s = self.btmc.getVisibility()
-#        print str(s)
-#        if s:
-	if obj.state_get()==0:
+        if self.btmc.getVisibility()==obj.state_get():
+            return 0
+    #        s = self.btmc.getVisibility()
+    #        print str(s)
+    #        if s:
+        if obj.state_get()==0:
             print "Turn off"
-#            self.toggle1.state_set(0)
             self.btmc.setVisibility(0)
         else:
             print "Turn on"
-#            self.toggle1.state_set(1)
             self.btmc.setVisibility(1)
-        
+
+    def toggle2Click(self, obj, event, *args, **kargs):
+        print "BT toggle2Cleck set on off spi hci servis"
+        if self.btmc.getService()==obj.state_get():
+            return 0
+    #        s = self.btmc.getVisibility()
+    #        print str(s)
+    #        if s:
+        if obj.state_get()==0:
+            print "Turn off"
+            os.system("/etc/init.d/bluetooth stop")
+        else:
+            print "Turn on"
+            os.system("/etc/init.d/bluetooth start")
+
+
+    def toggle3Click(self, obj, event, *args, **kargs):
+        print "BT toggle3Cleck set on off obexftpd servis"
+        if self.btmc.getServiceObex()==obj.state_get():
+            return 0
+    #        s = self.btmc.getVisibility()
+    #        print str(s)
+    #        if s:
+        if obj.state_get()==0:
+            print "Turn off"
+            os.system("killall -9 obexftpd")
+        else:
+            print "Turn on"
+            os.system("cd /tmp && obexftpd -b -c /tmp &")
+
 
     def createView(self):
         self.btmc = BtMstateContener()
@@ -216,6 +272,29 @@ class Bt(module.AbstractModule):
             self.toggle1.state_set(vi)
             box1.pack_end(self.toggle1)
             self.toggle1.changed = self.toggle1Click
+
+
+            
+            self.toggle2 = elementary.Toggle(self.window)
+            self.toggle2.label_set("Services (spi, hci):")
+            self.toggle2.size_hint_align_set(-1.0, 0.0)
+            self.toggle2.states_labels_set("On","Off")
+            box1.pack_end(self.toggle2)
+            self.toggle2.changed = self.toggle2Click
+
+
+            self.toggle3 = elementary.Toggle(self.window)
+            self.toggle3.label_set("Services (ObexFTPd):")
+            self.toggle3.size_hint_align_set(-1.0, 0.0)
+            self.toggle3.states_labels_set("On","Off")
+            if os.popen("obexftpd --help | grep ObexFTPd").read().replace("\n","")!="":
+                self.toggle3.show()
+                box1.pack_end(self.toggle3)
+                self.toggle3.changed = self.toggle3Click
+            else:
+                print "No obexftpd found :/ toggle disable"
+
+
 
 
         self.BtmodGUIupdate()
