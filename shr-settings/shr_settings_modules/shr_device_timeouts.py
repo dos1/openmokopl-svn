@@ -121,9 +121,13 @@ class Timeouts(module.AbstractModule):
 
                     value = self.timeouts[i]
 
+                    add = ""
+                    for s in range(len(str(value)), 5, 1):
+                        add = add + " "
+
                     valuel = elementary.Label(self.window)
-                    valuel.size_hint_align_set(0.0, 0.0)
-                    valuel.label_set(str(self.timeouts[i]))
+                    valuel.size_hint_align_set(0.5, 0.0)
+                    valuel.label_set(add+str(self.timeouts[i]))
                     valuel.show()
 
                     minbt = Button2(self.window)
