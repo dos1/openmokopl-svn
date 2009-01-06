@@ -54,12 +54,16 @@ def btClick(obj, event):
     btNr = obj.get_nr()
     i = 0
 
+    print "1"
+    global box1
     box1.hide()
-    box1.delete()
+    print "2"
     box1 = elementary.Box(win)
-    box1.size_hint_weight_set(1.0, -1.0)
-    sc.content_set(box1)
+    print "3"
+    box1.size_hint_weight_set(1.0, 0.0)
+    print "4"
     box1.show()
+    print "5"
 
     for d in dirs:
         if i == btNr:
