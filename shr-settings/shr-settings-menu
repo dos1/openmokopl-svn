@@ -60,7 +60,7 @@ def btClick(obj, event):
     print "2"
     box1 = elementary.Box(win)
     print "3"
-    box1.size_hint_weight_set(1.0, 0.0)
+    box1.size_hint_weight_set(1.0, -1.0)
     print "4"
     box1.show()
     print "5"
