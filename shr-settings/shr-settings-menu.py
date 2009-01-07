@@ -188,8 +188,17 @@ class MainWindow:
                 ic.scale_set(0, 0)
                 bt.icon_set(ic)
                 ic.show()
+
             except:
-                bt.label_set( str(d[0]) )
+                try:
+                    f = open("/usr/share/pixmaps/"+str(d[1]), "r")
+                    ic = elementary.Icon(self.win)
+                    ic.file_set("/usr/share/pixmaps/"+str(d[1]) )
+                    ic.scale_set(0, 0)
+                    bt.icon_set(ic)
+                    ic.show()
+                except:
+                    bt.label_set( str(d[0]) )
 
             box1.pack_end(bt)
 
