@@ -17,8 +17,6 @@ class Button2(elementary.Button):
 
 class ModulesWindow:
     def __init__(self):
-        from shr_settings_modules import shr_gsm, shr_device_timeouts,shr_pm, shr_bt, shr_wifi, shr_gprs, shr_usb, shr_clock, shr_profile, shr_services, shr_misc, shr_test
-
         print "1"
         self.win2 = elementary.Window("settingsMods", elementary.ELM_WIN_BASIC)
         print "2"
@@ -114,7 +112,7 @@ class MainWindow:
         #def makeGui(self, dbus_system, modules):
         ModulesWindow().makeGui(  obj.get_modules() )
 
-    def makeGui(self):
+    def __init__(self):
         self.win = elementary.Window("settings", elementary.ELM_WIN_BASIC)
         self.win.title_set("Settings")
         self.win.destroy = self.destroy
@@ -212,7 +210,7 @@ class MainWindow:
 
 if __name__ == "__main__":
     elementary.init()
-    w = MainWindow()
-    w.makeGui()
+    MainWindow()
+    
 
     
