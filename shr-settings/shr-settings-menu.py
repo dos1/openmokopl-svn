@@ -16,20 +16,20 @@ class Button2(elementary.Button):
 
 
 class ModulesWindow:
-    def __init__(self):
-        print "1"
-        self.win2 = elementary.Window("settingsMods", elementary.ELM_WIN_BASIC)
-        print "2"
-        self.win2.title_set("Settings modules")
-        print "3"
-        self.win2.destroy = self.destroy2
-        
     def makeGui(self,  modulesList):
+
+        elementary.init()
+
         from shr_settings_modules import shr_gsm, shr_device_timeouts,shr_pm, shr_bt, shr_wifi, shr_gprs, shr_usb, shr_clock, shr_profile, shr_services, shr_misc, shr_test
 
         mainloop = e_dbus.DBusEcoreMainLoop()
         #dbus_session = dbus.SessionBus(mainloop=self.mainloop) - we don't need atm
         dbus_system = dbus.SystemBus(mainloop=mainloop)
+
+        self.win2 = elementary.Window("settingsMods", elementary.ELM_WIN_BASIC)
+        self.win2.title_set("Settings modules")
+        self.win2.destroy = self.destroy2
+        
 
         self.bg2 = elementary.Background(self.win2)
         self.win2.resize_object_add(self.bg2)
@@ -69,15 +69,11 @@ class ModulesWindow:
 
 
 
-        print "1"
         for mod in modulesList:
-            print "2"
+        
             print "loading %s" % mod
-            print "3"
             mod2 = mod(self.win2, dbus_system);
-            print "4"
             if mod2.isEnabled():
-                print "5"
                 frame = elementary.Frame(self.win2)
 
                 frame.label_set(mod2.getName()+" settings")
@@ -92,11 +88,11 @@ class ModulesWindow:
                 else:
                     print " error! module %s method createView() return's nothing!" % mod2
 
-        win2.show()
+        self.win2.show()
 
     def destroy2(self,obj, event, *args, **kargs):
         self.win2.hide()
-
+        
 
 
 
@@ -110,7 +106,11 @@ class MainWindow:
     def displayModulesWin(self, obj,event):
         #odulesWindow:
         #def makeGui(self, dbus_system, modules):
-        ModulesWindow().makeGui(  obj.get_modules() )
+        print "displayModulesWin 1"
+        m = ModulesWindow()
+        print "displayModulesWin 2"
+        m.makeGui(  obj.get_modules() )
+        print "displayModulesWin 3"
 
     def __init__(self):
         self.win = elementary.Window("settings", elementary.ELM_WIN_BASIC)
@@ -173,7 +173,7 @@ class MainWindow:
 
         for d in dirs:
             bt = Button2(self.win)
-            bt.set_modules( d[1] )
+            bt.set_modules( d[2] )
 
             bt.clicked = self.displayModulesWin
             bt.size_hint_align_set(-1.0, 0.0)
@@ -205,12 +205,12 @@ class MainWindow:
 
 
         self.win.show()
-        elementary.run()
-        elementary.shutdown()
+        
 
 if __name__ == "__main__":
     elementary.init()
     MainWindow()
-    
+    elementary.run()
+    elementary.shutdown()
 
     
