@@ -74,7 +74,7 @@ class Timeouts(module.AbstractModule):
     
 
     def createView(self):
-        
+        elementary.init()
         self.box1 = elementary.Box(self.window)
 
 

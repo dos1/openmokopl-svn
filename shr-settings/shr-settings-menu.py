@@ -159,15 +159,15 @@ class MainWindow:
 
         from shr_settings_modules import shr_gsm, shr_device_timeouts,shr_pm, shr_bt, shr_wifi, shr_gprs, shr_usb, shr_clock, shr_profile, shr_services, shr_misc, shr_test
 
-        dirs = [    ["bluetooth","ico_bt_32_32.png",            [ shr_bt.Bt ] ],
-                    ["services","ico_initd_32_32.png",         [ shr_services.Services ] ],
-                    ["profiles","ico_profile_32_32.png",       [ shr_profile.Profile ] ],
-                    ["clock","ico_timeset_32_32.png",       [ shr_clock.Clock ] ],
+        dirs = [    ["Bluetooth","ico_bt_32_32.png",            [ shr_bt.Bt ] ],
+                    ["Services","ico_initd_32_32.png",         [ shr_services.Services ] ],
+                    ["Profiles","ico_profile_32_32.png",       [ shr_profile.Profile ] ],
+                    ["Clock","ico_timeset_32_32.png",       [ shr_clock.Clock ] ],
                     ["GSM","ico_gsm_32_32.png",           [ shr_gsm.Gsm ] ],
-                    ["power manager","ico_powermanager_32_32.png",  [ shr_pm.Pm ] ],
-                    ["time out","ico_timeout_32_32.png",       [ shr_device_timeouts.Timeouts ] ],
-                    ["usb","ico_usb_32_32.png",           [ shr_usb.Usb ] ],
-                    ["others", "ico_others_32_32.png",                  [ shr_wifi.Wifi, shr_gprs.Gprs, shr_misc.Misc, shr_test.Test ] ]
+                    ["Power manager","ico_powermanager_32_32.png",  [ shr_pm.Pm ] ],
+                    ["Time outs","ico_timeout_32_32.png",       [ shr_device_timeouts.Timeouts ] ],
+                    ["Usb","ico_usb_32_32.png",           [ shr_usb.Usb ] ],
+                    ["Others", "ico_others_32_32.png",                  [ shr_wifi.Wifi, shr_gprs.Gprs, shr_misc.Misc, shr_test.Test ] ]
             ]
 
 

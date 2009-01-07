@@ -52,6 +52,7 @@ class Profile(module.AbstractModule):
             ecore.timer_add( 1.0, self.guiUpdate)
 
     def createView(self):
+        elementary.init()
 
         self.stan = ""
         

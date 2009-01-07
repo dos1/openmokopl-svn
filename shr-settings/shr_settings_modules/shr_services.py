@@ -174,6 +174,7 @@ class Services(module.AbstractModule):
         self.winser.show()
 
     def createView(self):
+        elementary.init()
         self.editable = False
 
         box0 = elementary.Box(self.window)

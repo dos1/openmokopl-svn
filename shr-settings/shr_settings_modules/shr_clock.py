@@ -28,6 +28,7 @@ class Clock(module.AbstractModule):
                 self.editable = True
 
     def createView(self):
+        elementary.init()
         self.editable = False
         box0 = elementary.Box(self.window)
         self.cl = elementary.Clock(self.window)

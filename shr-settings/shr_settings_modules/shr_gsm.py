@@ -279,6 +279,7 @@ class Gsm(module.AbstractModule):
 
 
     def createView(self):
+        elementary.init()
         self.gsmsc = GSMstateContener()
         
         self.box1 = elementary.Box(self.window)

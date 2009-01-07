@@ -245,6 +245,7 @@ class Bt(module.AbstractModule):
 
 
     def createView(self):
+        elementary.init()
         self.btmc = BtMstateContener()
         vi = self.btmc.getVisibility()
 

@@ -83,7 +83,8 @@ class Pm(module.AbstractModule):
             print ":("
 
     def createView(self):
-        
+        elementary.init()
+
         self.box1 = elementary.Box(self.window)
 
 
