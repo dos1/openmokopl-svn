@@ -77,13 +77,14 @@ class Pm(module.AbstractModule):
             self.capl.label_set("Capacity: "+cap+" %")
 
             #FIXME: if it does not work.. we should try again?
-            ecore.timer_add( 2.3, self.refreshAct)
+            if self.guiUpdate:
+                ecore.timer_add( 2.3, self.refreshAct)
 
         except:
             print ":("
 
     def createView(self):
-        
+        self.guiUpdate = 1
         self.box1 = elementary.Box(self.window)
 
 
@@ -189,5 +190,7 @@ class Pm(module.AbstractModule):
         
         return self.box1
 
-
+    def stopUpdate(self):
+        print "PM desktructor"
+        self.guiUpdate = 0
 

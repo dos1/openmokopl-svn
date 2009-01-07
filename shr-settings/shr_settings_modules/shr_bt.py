@@ -181,8 +181,8 @@ class Bt(module.AbstractModule):
 
         self.toggle3.state_set( obex )
 
-
-        ecore.timer_add( 5.4, self.BtmodGUIupdate)
+        if self.guiUpdate:
+            ecore.timer_add( 5.4, self.BtmodGUIupdate)
 
     def toggle0Click(self, obj, event, *args, **kargs):
 #        if self.btmc.getPower():
@@ -245,6 +245,7 @@ class Bt(module.AbstractModule):
 
 
     def createView(self):
+        self.guiUpdate = 1
         self.btmc = BtMstateContener()
         vi = self.btmc.getVisibility()
 
@@ -300,4 +301,7 @@ class Bt(module.AbstractModule):
         self.BtmodGUIupdate()
 
         return box1
-        
+
+    def stopUpdate(self):
+        print "BT desktructor"
+        self.guiUpdate = 0

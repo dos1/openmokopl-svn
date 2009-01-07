@@ -49,9 +49,11 @@ class Profile(module.AbstractModule):
 
         if state == 1:
             self.pr_iface.SetProfile(profile)
-            ecore.timer_add( 1.0, self.guiUpdate)
+            if self.guiUpdate:
+                ecore.timer_add( 1.0, self.guiUpdate)
 
     def createView(self):
+        self.guiUpdate = 1
         self.stan = ""
         
         try:
@@ -116,3 +118,10 @@ class Profile(module.AbstractModule):
        
 
         return boxh
+
+
+    def stopUpdate(self):
+        print "Profile desktructor"
+        self.guiUpdate = 0
+
+

@@ -68,11 +68,13 @@ class ModulesWindow:
         box12.show()
 
 
-
+        self.modList = []
         for mod in modulesList:
         
             print "loading %s" % mod
             mod2 = mod(self.win2, dbus_system)
+            elementary.init()
+            self.modList.append(mod2)
 
             if mod2.isEnabled():
                 frame = elementary.Frame(self.win2)
@@ -93,6 +95,11 @@ class ModulesWindow:
 
     def destroy2(self,obj, event, *args, **kargs):
         self.win2.hide()
+        for m in self.modList:
+            try:
+                m.stopUpdate()
+            except:
+                pass
         
 
 
@@ -114,6 +121,7 @@ class MainWindow:
         print "displayModulesWin 3"
 
     def __init__(self):
+        elementary.init()
         self.win = elementary.Window("settings", elementary.ELM_WIN_BASIC)
         self.win.title_set("Settings")
         self.win.destroy = self.destroy
@@ -218,7 +226,7 @@ class MainWindow:
         
 
 if __name__ == "__main__":
-    elementary.init()
+    
     MainWindow()
     elementary.run()
     elementary.shutdown()
