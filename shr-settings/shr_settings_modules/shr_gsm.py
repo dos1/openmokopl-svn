@@ -201,7 +201,6 @@ class Gsm(module.AbstractModule):
 
     def informationbt(self, obj, event, *args, **kargs):
         print "GSM infobt [inf]"
-
         self.wininfo = elementary.Window("deviceInfo", elementary.ELM_WIN_BASIC)
         self.wininfo.title_set("GSM modem information")
         self.wininfo.autodel_set(True)
@@ -279,7 +278,7 @@ class Gsm(module.AbstractModule):
 
 
     def createView(self):
-        elementary.init()
+        
         self.gsmsc = GSMstateContener()
         
         self.box1 = elementary.Box(self.window)

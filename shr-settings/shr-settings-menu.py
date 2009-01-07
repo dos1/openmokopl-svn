@@ -72,7 +72,8 @@ class ModulesWindow:
         for mod in modulesList:
         
             print "loading %s" % mod
-            mod2 = mod(self.win2, dbus_system);
+            mod2 = mod(self.win2, dbus_system)
+
             if mod2.isEnabled():
                 frame = elementary.Frame(self.win2)
 

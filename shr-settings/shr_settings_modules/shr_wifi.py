@@ -24,8 +24,6 @@ class Wifi(module.AbstractModule):
 
 
     def createView(self):
-        elementary.init()
-
         try:
                 self.wifi = getDbusObject (self.dbus, "org.freesmartphone.odeviced", "/org/freesmartphone/Device/PowerControl/WiFi", "org.freesmartphone.Device.PowerControl")
         except:
