@@ -121,10 +121,10 @@ class MainWindow:
         #as in exposure.py:
        
 
-        bg = elementary.Background(self.win)
-        self.win.resize_object_add(bg)
-        bg.size_hint_weight_set(1.0, 1.0)
-        bg.show()
+        self.bg = elementary.Background(self.win)
+        self.win.resize_object_add(self.bg)
+        self.bg.size_hint_weight_set(1.0, 1.0)
+        self.bg.show()
 
         box0 = elementary.Box(self.win)
         box0.size_hint_weight_set(1.0, 1.0)
@@ -167,7 +167,7 @@ class MainWindow:
                     ["power manager","ico_powermanager_32_32.png",  [ shr_pm.Pm ] ],
                     ["time out","ico_timeout_32_32.png",       [ shr_device_timeouts.Timeouts ] ],
                     ["usb","ico_usb_32_32.png",           [ shr_usb.Usb ] ],
-                    ["others", "",                  [ shr_wifi.Wifi, shr_gprs.Gprs, shr_misc.Misc, shr_test.Test ] ]
+                    ["others", "ico_others_32_32.png",                  [ shr_wifi.Wifi, shr_gprs.Gprs, shr_misc.Misc, shr_test.Test ] ]
             ]
 
 
