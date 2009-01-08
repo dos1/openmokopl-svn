@@ -59,10 +59,13 @@ class SimMstateContener:
 
     def MessageBookClean(self):
         messageMax = self.GetMessagebookInfo()['last']
-        print "MessageBookClean max"+str(messageMax)
+        print "MessageBookClean max: "+str(messageMax)
         for i in range(1, (messageMax+1), 1):
-            print "remove id:"+str(i)
-            self.gsm_sim_iface.DeleteMessage(i)
+            print "remove id: "+str(i)
+            try:
+                self.gsm_sim_iface.DeleteMessage(i)
+            except:
+                pass
         print "DONE"
 
     def getService(self):
