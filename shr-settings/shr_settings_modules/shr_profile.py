@@ -57,9 +57,9 @@ class Profile(module.AbstractModule):
         self.stan = ""
         
         try:
-            DBusGMainLoop(set_as_default=True)
-            bus = dbus.SystemBus()
-            pr_device_obj = bus.get_object( "org.freesmartphone.opreferencesd", "/org/freesmartphone/Preferences" )
+            #DBusGMainLoop(set_as_default=True)
+            #bus = dbus.SystemBus()
+            pr_device_obj = self.dbus.get_object( "org.freesmartphone.opreferencesd", "/org/freesmartphone/Preferences" )
             self.pr_iface = dbus.Interface(pr_device_obj, "org.freesmartphone.Preferences" )
             self.stan = self.pr_iface.GetProfile()
             self.dbus_status = 1

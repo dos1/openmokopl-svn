@@ -22,11 +22,9 @@ class Button2( elementary.Button ):
         return self.mOpeNr
 
 class GSMstateContener:
-    def __init__(self):
+    def __init__(self, bus):
         self.dbus_state = 0
         try:
-            DBusGMainLoop(set_as_default=True)
-            bus = dbus.SystemBus()
             gsm_device_obj = bus.get_object( 'org.freesmartphone.ogsmd', '/org/freesmartphone/GSM/Device' )
             self.gsm_network_iface = dbus.Interface(gsm_device_obj, 'org.freesmartphone.GSM.Network')
             self.gsm_device_iface = dbus.Interface(gsm_device_obj, 'org.freesmartphone.GSM.Device')
@@ -279,7 +277,7 @@ class Gsm(module.AbstractModule):
 
     def createView(self):
         
-        self.gsmsc = GSMstateContener()
+        self.gsmsc = GSMstateContener(self.dbus)
         
         self.box1 = elementary.Box(self.window)
 

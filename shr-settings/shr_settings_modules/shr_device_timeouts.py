@@ -34,9 +34,9 @@ class Timeouts(module.AbstractModule):
     #----------------------------------------------------------------------------#
     def getObject( self, busname, objectpath ):
     #----------------------------------------------------------------------------#
-        DBusGMainLoop(set_as_default=True)
-        bus = dbus.SystemBus()
-        return bus.get_object( busname, objectpath, follow_name_owner_changes=True )
+        #DBusGMainLoop(set_as_default=True)
+        #bus = dbus.SystemBus()
+        return self.dbus.get_object( busname, objectpath, follow_name_owner_changes=True )
 
     #----------------------------------------------------------------------------#
     def getInterface( self, busname, objectpath, interface ):
