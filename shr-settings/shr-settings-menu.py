@@ -16,15 +16,11 @@ class Button2(elementary.Button):
 
 
 class ModulesWindow:
-    def makeGui(self,  modulesList):
+    def makeGui(self,  modulesList, bus):
 
         elementary.init()
 
         from shr_settings_modules import shr_gsm, shr_device_timeouts,shr_pm, shr_bt, shr_wifi, shr_gprs, shr_usb, shr_clock, shr_profile, shr_services, shr_misc, shr_test
-
-        mainloop = e_dbus.DBusEcoreMainLoop()
-        #dbus_session = dbus.SessionBus(mainloop=self.mainloop) - we don't need atm
-        dbus_system = dbus.SystemBus(mainloop=mainloop)
 
         self.win2 = elementary.Window("settingsMods", elementary.ELM_WIN_BASIC)
         self.win2.title_set("Settings modules")
@@ -72,7 +68,7 @@ class ModulesWindow:
         for mod in modulesList:
         
             print "loading %s" % mod
-            mod2 = mod(self.win2, dbus_system)
+            mod2 = mod(self.win2, bus)
             elementary.init()
             self.modList.append(mod2)
 
@@ -115,9 +111,8 @@ class MainWindow:
         #odulesWindow:
         #def makeGui(self, dbus_system, modules):
         print "displayModulesWin 1"
-        m = ModulesWindow()
         print "displayModulesWin 2"
-        m.makeGui(  obj.get_modules() )
+        self.m.makeGui(  obj.get_modules(), self.dbus_system )
         print "displayModulesWin 3"
 
     def __init__(self):
@@ -126,9 +121,14 @@ class MainWindow:
         self.win.title_set("Settings")
         self.win.destroy = self.destroy
 
+
+
         #dbus init:
-        #as in exposure.py:
+        mainloop = e_dbus.DBusEcoreMainLoop()
+        #dbus_session = dbus.SessionBus(mainloop=self.mainloop) - we don't need atm
+        self.dbus_system = dbus.SystemBus(mainloop=mainloop)
        
+        self.m = ModulesWindow()
 
         self.bg = elementary.Background(self.win)
         self.win.resize_object_add(self.bg)
@@ -166,17 +166,18 @@ class MainWindow:
 
         #loading modules
 
-        from shr_settings_modules import shr_gsm, shr_device_timeouts,shr_pm, shr_bt, shr_wifi, shr_gprs, shr_usb, shr_clock, shr_profile, shr_services, shr_misc, shr_test
+        from shr_settings_modules import shr_gsm,shr_sim, shr_device_timeouts,shr_pm, shr_bt, shr_wifi, shr_gprs, shr_usb, shr_clock, shr_profile, shr_services, shr_misc, shr_test
 
         dirs = [    ["Bluetooth","ico_bt_32_32.png",            [ shr_bt.Bt ] ],
-                    ["Services","ico_initd_32_32.png",         [ shr_services.Services ] ],
-                    ["Profiles","ico_profile_32_32.png",       [ shr_profile.Profile ] ],
-                    ["Clock","ico_timeset_32_32.png",       [ shr_clock.Clock ] ],
-                    ["GSM","ico_gsm_32_32.png",           [ shr_gsm.Gsm ] ],
+                    ["Services","ico_initd_32_32.png",          [ shr_services.Services ] ],
+                    ["Sim","ico_sim_32_32.png",                 [ shr_sim.Sim ] ],
+                    ["Profiles","ico_profile_32_32.png",        [ shr_profile.Profile ] ],
+                    ["Clock","ico_timeset_32_32.png",           [ shr_clock.Clock ] ],
+                    ["GSM","ico_gsm_32_32.png",                 [ shr_gsm.Gsm ] ],
                     ["Power manager","ico_powermanager_32_32.png",  [ shr_pm.Pm ] ],
-                    ["Time outs","ico_timeout_32_32.png",       [ shr_device_timeouts.Timeouts ] ],
-                    ["Usb","ico_usb_32_32.png",           [ shr_usb.Usb ] ],
-                    ["Others", "ico_others_32_32.png",                  [ shr_wifi.Wifi, shr_gprs.Gprs, shr_misc.Misc, shr_test.Test ] ]
+                    ["Time outs","ico_timeout_32_32.png",           [ shr_device_timeouts.Timeouts ] ],
+                    ["Usb","ico_usb_32_32.png",                 [ shr_usb.Usb ] ],
+                    ["Others", "ico_others_32_32.png",          [ shr_wifi.Wifi, shr_gprs.Gprs, shr_misc.Misc, shr_test.Test ] ]
             ]
 
 
