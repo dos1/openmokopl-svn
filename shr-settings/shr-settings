@@ -193,7 +193,7 @@ class MainWindow:
 
 
             try:
-                f = open("data/"+str(d[1]), "r")
+                f = open("data/icons/"+str(d[1]), "r")
                 ic = elementary.Icon(self.win)
                 ic.file_set("data/"+str(d[1]) )
                 ic.scale_set(0, 0)
