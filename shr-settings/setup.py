@@ -20,8 +20,8 @@ dist = setup( name='shr-settings',
     license='GNU GPL',
     packages=['shr_settings_modules'],
     scripts=['shr-settings'],
-    pixmaps=['data/icons'],
-    data_files=[('applications', ['data/shr-settings.desktop'])
+    data_files=[('applications', ['data/shr-settings.desktop']),
+		('pixmaps' , glob.glob("data/icons/*.png"))
         ]
 )
 
