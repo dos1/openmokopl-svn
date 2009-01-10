@@ -37,7 +37,7 @@ class Pm(module.AbstractModule):
     def suspendbtClick(self, obj, event):
         iface = self.get_usage_iface()
 
-        if os.popen("cat /proc/cpuinfo | grep GTA01").read() == "GTA01\n":
+        if os.popen("cat /proc/cpuinfo | grep [G]TA01").read() == "GTA01\n":
             print "suspend for GTA01"
             os.system("/etc/init.d/fso-gsmd stop")
             time.sleep(0)

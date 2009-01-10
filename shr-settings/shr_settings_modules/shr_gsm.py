@@ -315,7 +315,7 @@ class Gsm(module.AbstractModule):
             self.box1.pack_end( errlab )
 
 
-            if os.popen("ps -A | grep ophonekitd").read() == "":
+            if os.popen("ps -A | grep [o]phonekitd").read() == "":
                 boxOp = elementary.Box(self.window)
                 boxOp.size_hint_weight_set(1.0, 1.0)
                 boxOp.size_hint_align_set(-1.0, 0.0)
