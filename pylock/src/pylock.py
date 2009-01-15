@@ -71,6 +71,8 @@ providerName = ""
 
 idleStatus = ""
 
+usage_iface = 0
+
 lock = 0
 
 Deb("Loading pixmaps start")
@@ -175,7 +177,12 @@ class LockScreen(threading.Thread):
         while lock:
             if idleStatus == "lock" and onBattery == 1:
                 Deb("LockScreen ------------ put suspend -----------------")
-
+                Deb("LockScreen ------------ "+time.ctime()+" -----------------")
+                os.system("/etc/init.d/fso-gsmd stop")
+                usage_iface.Suspend()
+                os.system("sleep 6 && /etc/init.d/fso-gsmd stop &")
+                Deb("LockScreen ------------ "+time.ctime()+" -----------------")
+                Deb("LockScreen ------------ put suspend -----------------")
 
 
             event = pygame.event.poll()
@@ -424,6 +431,11 @@ if __name__ == "__main__":
     DBusGMainLoop(set_as_default=True)
     gobject.threads_init()
     bus = dbus.SystemBus()
+
+    Deb("pylock getting dbus usage interface")
+    usage_obj = dbus.get_object( 'org.freesmartphone.ousaged', '/org/freesmartphone/Usage' )
+    usage_iface = dbus.Interface(usage_obj, 'org.freesmartphone.Usage')
+    Deb("pylock getting dbus usage interface got it :)")
 
     Deb("pylock d_battery")
     d_battery = De_Battery()
