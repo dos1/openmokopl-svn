@@ -99,6 +99,7 @@ pix_gsm_sig = [ \
     pygame.image.load('gsm_sig_100.png')
     ]
 pix_battery =  pygame.image.load('battery.png')
+pix_battery_charging =  pygame.image.load('battery_charge.png')
 
 Deb("Loading pixmaps wallpapers")
 pix_bg = []
@@ -186,9 +187,25 @@ class LockScreen(threading.Thread):
         
         self.repeint()
 
-        
+        global onBattery
+        onBattery_old = onBattery
 
         while lock:
+            if onBattery != onBattery_old:
+                Deb("LockScreen onBattery status change")
+                onBattery_old = onBattery
+                self.repeint()
+                if onBattery == 0:
+                    text_charging = font110.render("Charging...", 1, (255,255,255))
+                    self.screen.blit( text_charging, \
+                        (GetSurfaceCenter_x(text_charging), 200 )
+                        )
+                    self.screen.blit( pix_bt_charg, \
+                        (GetSurfaceCenter_x(pix_bt_charg), 300 )
+                        )
+                    pygame.display.flip()
+
+
             event = pygame.event.poll()
             if event.type == pygame.MOUSEBUTTONUP:
                 Deb("LockScreen __init__ click MOUSEBUTTONUP lock")
@@ -241,6 +258,7 @@ class LockScreen(threading.Thread):
 
     def repeint(self):
         Deb("LockScreen repaint()")
+        global onBattery
 
         self.screen.fill((0,0,0))
 
@@ -249,7 +267,11 @@ class LockScreen(threading.Thread):
         self.screen.blit( pix_bg_top, (0,0))
         self.screen.blit( pix_bg_unlock, (0,570))
         self.screen.blit( pix_gsm, (0,0))
+        Deb("LockScreen repaint onBattery:["+str(onBattery)+"]")
+        if onBattery == 0:
+            self.screen.blit( pix_battery_charging, ((screenSize[0]-55),1))
         self.screen.blit( pix_battery, ((screenSize[0]-60),6))
+
 
         #signalStre
         pos = (40,12)
@@ -342,9 +364,7 @@ class De_Battery(threading.Thread):
 
     def oevent( self, name, action, seconds):
         Deb("De_Battery oevent signal----------")
-        Deb("De_Battery oevent name :["+str(name)+"]")
-        Deb("De_Battery oevent action :["+str(action)+"]")
-        Deb("De_Battery oevent seconds :["+str(seconds)+"]")
+        Deb("De_Battery oevent name :["+str(name)+"] action :["+str(action)+"] seconds :["+str(seconds)+"]")
 
         if name == "AUX" and action == "released" and seconds == 0:
             global lock
@@ -404,9 +424,7 @@ class De_Battery(threading.Thread):
 
     def callincomming(self, name, action, seconds):
         Deb("De_Battery callincomming signal----------")
-        Deb("De_Battery callincomming name :["+str(name)+"]")
-        Deb("De_Battery callincomming action :["+str(action)+"]")
-        Deb("De_Battery callincomming seconds :["+str(seconds)+"]")
+        Deb("De_Battery callincomming name :["+str(name)+"] action :["+str(action)+"] seconds :["+str(seconds)+"]")
         if action == "incoming":
             global lock
             if lock == 1:
@@ -436,8 +454,7 @@ class De_brightness(threading.Thread):
     def stateChange(self,name):
         global onBattery
         Deb("De_brightness stateChange signal------------")
-        Deb("De_brightness stateChange signal :["+str(name)+"]")
-        Deb("De_brightness stateChange onBattery :["+str(onBattery)+"]")
+        Deb("De_brightness stateChange signal :["+str(name)+"] onBattery :["+str(onBattery)+"]")
         global idleStatus
         idleStatus = str(name)
 
@@ -479,11 +496,18 @@ class De_brightness(threading.Thread):
 if __name__ == "__main__":
     Deb("pylock Start")
 
-    Deb("pylock getting dbus usage interface")
-    usage_obj = bus.get_object( 'org.freesmartphone.ousaged', '/org/freesmartphone/Usage' )
-    usage_iface = dbus.Interface(usage_obj, 'org.freesmartphone.Usage')
-    Deb("pylock dbus interface test it ["+str(usage_iface.ListResources())+"]")
-    Deb("pylock getting dbus usage interface got it :)")
+
+    while 1:
+        try:
+            Deb("pylock getting dbus usage interface")
+            usage_obj = bus.get_object( 'org.freesmartphone.ousaged', '/org/freesmartphone/Usage' )
+            usage_iface = dbus.Interface(usage_obj, 'org.freesmartphone.Usage')
+            Deb("pylock dbus interface test it ["+str(usage_iface.ListResources())+"]")
+            Deb("pylock getting dbus usage interface got it :)")
+            break
+        except:
+            Deb("pylock getting dbus error wait 5sec.")
+            time.sleep(5)
 
     Deb("pylock d_battery")
     d_battery = De_Battery()
