@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 
 __author__="yoyo"
 __date__ ="$Jan 15, 2009 2:40:18 PM$"
@@ -6,6 +8,8 @@ __date__ ="$Jan 15, 2009 2:40:18 PM$"
 from threading import Thread
 import threading
 import time,sys,os,random
+
+import dircache,re
 import pygame
 
 import dbus
@@ -47,7 +51,10 @@ def GetSurfaceCenter_x( surface ):
 
 
 
-
+Deb("pylock init main dbus loop")
+DBusGMainLoop(set_as_default=True)
+gobject.threads_init()
+bus = dbus.SystemBus()
 
 
 clock = pygame.time.Clock()
@@ -56,6 +63,7 @@ pygame.font.init
 pygame.font.init()
 font160 = pygame.font.Font(None, 160)
 font110 = pygame.font.Font(None, 110)
+font60 = pygame.font.Font(None, 60)
 font40 = pygame.font.Font(None, 40)
 font25 = pygame.font.Font(None, 25)
 font15 = pygame.font.Font(None, 15)
@@ -71,19 +79,12 @@ providerName = ""
 
 idleStatus = ""
 
-usage_iface = 0
 
 lock = 0
 
 Deb("Loading pixmaps start")
 pix_bt_charg = pygame.image.load('charge.png')
 pix_bt_low = pygame.image.load('low_battery.png')
-pix_bg = [ \
-    pygame.image.load('bg_virus.png'),
-    pygame.image.load('bg_why.png'),
-    pygame.image.load('bg_box.png'),
-    pygame.image.load('bg.png')
-    ]
 pix_bg_top =  pygame.image.load('bg_mask_top.png')
 pix_bg_unlock = pygame.image.load('bg_unlock.png')
 pix_lock_out =  pygame.image.load('lock_out.png')
@@ -98,6 +99,19 @@ pix_gsm_sig = [ \
     pygame.image.load('gsm_sig_100.png')
     ]
 pix_battery =  pygame.image.load('battery.png')
+
+Deb("Loading pixmaps wallpapers")
+pix_bg = []
+fileList = dircache.listdir("./")
+bg_count = 0
+for p in fileList:
+    if str(p).find('bg0_') != -1 and str(p).find('.png'):
+        Deb("File ["+str(p)+"] add as wallpaper.")
+        bg_count+=1
+        pix_bg.append( pygame.image.load(p) )
+        break
+
+
 Deb("Loading pixmaps end")
 
 
@@ -159,7 +173,7 @@ class LockScreen(threading.Thread):
     def __init__(self):
         Thread.__init__(self)
         Deb("LockScreen __init__ start")
-        self.bg_nr = random.randint(0,4)-1
+        self.bg_nr = random.randint(0,bg_count)-1
         
 
     def run(self):
@@ -175,16 +189,6 @@ class LockScreen(threading.Thread):
         
 
         while lock:
-            if idleStatus == "lock" and onBattery == 1:
-                Deb("LockScreen ------------ put suspend -----------------")
-                Deb("LockScreen ------------ "+time.ctime()+" -----------------")
-                os.system("/etc/init.d/fso-gsmd stop")
-                usage_iface.Suspend()
-                os.system("sleep 6 && /etc/init.d/fso-gsmd stop &")
-                Deb("LockScreen ------------ "+time.ctime()+" -----------------")
-                Deb("LockScreen ------------ put suspend -----------------")
-
-
             event = pygame.event.poll()
             if event.type == pygame.MOUSEBUTTONUP:
                 Deb("LockScreen __init__ click MOUSEBUTTONUP lock")
@@ -197,6 +201,7 @@ class LockScreen(threading.Thread):
                         lock = 0
                         break
                     else:
+                        self.bg_nr = random.randint(0,bg_count)-1
                         self.repeint()
 
 
@@ -211,6 +216,12 @@ class LockScreen(threading.Thread):
                     self.y = random.randint(10,400)
                     Deb("LockScreen posible unlock at x["+str(self.x)+"] y["+str(self.y)+"]")
                     self.screen.blit( pix_lock_out, (self.x, self.y))
+
+                    text_unlock = font60.render("unlock", 1, (255,255,255))
+                    self.screen.blit( text_unlock, \
+                        (GetSurfaceCenter_x(text_unlock),580)
+                        )
+
                     pygame.display.flip()
                 else:
                     self.repeint()
@@ -297,12 +308,10 @@ class De_Battery(threading.Thread):
 
         online = open(sysfs_bat_online).read().replace("\n", "")
         if online == "1":
-            self.chargeStatus = 1
             onBattery = 0
         else:
-            self.chargeStatus = 0
             onBattery = 1
-        Deb("De_Battery self.chargeStatus :["+str(self.chargeStatus)+"]")
+        Deb("De_Battery onBattery :["+str(onBattery)+"]")
 
         global batteryCapa
         batteryCapa = int(open(sysfs_bat_capacity).read().replace("\n", ""))
@@ -354,16 +363,18 @@ class De_Battery(threading.Thread):
             os.system("xrandr -display :0 -o "+str(self.screenRotate))
 
         if name == "USB":
+            global onBattery
             if action == "released":
-                self.chargeStatus = 0
+                onBattery = 1
             elif action == "pressed":
-                self.chargeStatus = 1
+                onBattery = 0
                 if lock == 0:
                     monit = Monit( pix_bt_charg, "Charging...")
                     gobject.idle_add( monit.start )
                 else:
                     os.system("mplayer ./info.wav &")
                 time.sleep(1)
+	    Deb("De_Battery usb set onBattery: ["+str(onBattery)+"]")
 
 
         
@@ -375,19 +386,21 @@ class De_Battery(threading.Thread):
         global batteryCapa
         batteryCapa = int(value)
 
-    def gsmNetwork(self,value):
-        Deb("De_Battery gsmNetwork signal--------------")
-        Deb("De_Battery gsmNetwork signal :["+str(value)+"]")
-        global signalStre
-        signalStre = int(value)
-
-        if value < 65 and self.chargeStatus == 0:
+        if batteryCapa <= 65 and onBattery == 1:
             if lock == 0:
                 monit = Monit( pix_bt_low, "Low battery!")
                 gobject.idle_add( monit.start )
             else:
                 os.system("mplayer ./info.wav &")
             time.sleep(1)
+
+    def gsmNetwork(self,value):
+        Deb("De_Battery gsmNetwork signal--------------")
+        Deb("De_Battery gsmNetwork signal :["+str(value)+"]")
+        global onBattery
+        global signalStre
+        signalStre = int(value)
+
 
     def callincomming(self, name, action, seconds):
         Deb("De_Battery callincomming signal----------")
@@ -403,18 +416,60 @@ class De_Battery(threading.Thread):
             lock = 0
             Deb("De_Battery callincomming set global lock = 0")
         elif action == "release" and self.resumeLockAfterCall == 1:
-            if lock == 0:
-                Deb("De_Battery callincomming resumeLockAfterCall")
-                self.lock = LockScreen()
-                self.lock.start()
+            Deb("De_Battery callincomming resumeLockAfterCall")
+            lock = LockScreen()
+            lock.start()
         
 
 class De_brightness(threading.Thread):
+    def __init__(self):
+        Thread.__init__(self)
+
+        Deb("De_brightness __init__ getting dbus usage interface")
+        global bus
+        usage_obj = bus.get_object( 'org.freesmartphone.ousaged', '/org/freesmartphone/Usage' )
+        self.usage_iface = dbus.Interface(usage_obj, 'org.freesmartphone.Usage')
+        Deb("De_brightness __init__ dbus interface test it ["+str(usage_iface.ListResources())+"]")
+        Deb("De_brightness __init__ getting dbus usage interface got it :)")
+
+	
     def stateChange(self,name):
+        global onBattery
         Deb("De_brightness stateChange signal------------")
         Deb("De_brightness stateChange signal :["+str(name)+"]")
+        Deb("De_brightness stateChange onBattery :["+str(onBattery)+"]")
         global idleStatus
         idleStatus = str(name)
+
+        online = open(sysfs_bat_online).read().replace("\n", "")
+        if online == "1":
+            onBattery = 0
+        else:
+            onBattery = 1
+        Deb("De_brightness stateChange onBattery :["+str(onBattery)+"]")
+
+
+        if name=="idle_dim" and lock == 1 and onBattery == 1:
+            Deb("LockScreen ------------ put suspend -----------------")
+            Deb("LockScreen ------------ put suspend -----------------")
+            Deb("LockScreen ------------ put suspend -----------------")
+            Deb("LockScreen ------------ put suspend -----------------")
+
+            Deb("LockScreen -------sleep:----- "+time.ctime()+" -----------------")
+            os.system("/etc/init.d/fso-gpsd stop")
+            try:
+                self.usage_iface.Suspend()
+            except:
+                Deb("LockScreen dbus command Suspend() error")
+            os.system("sleep 6 && /etc/init.d/fso-gpsd stop &")
+            Deb("LockScreen -------weak:----- "+time.ctime()+" -----------------")
+
+            Deb("LockScreen ------------ put suspend -----------------")
+            Deb("LockScreen ------------ put suspend -----------------")
+            Deb("LockScreen ------------ put suspend -----------------")
+            Deb("LockScreen ------------ put suspend -----------------")
+
+
         
 
 
@@ -424,25 +479,16 @@ class De_brightness(threading.Thread):
 if __name__ == "__main__":
     Deb("pylock Start")
 
-   
-
-    
-    Deb("pylock init main dbus loop")
-    DBusGMainLoop(set_as_default=True)
-    gobject.threads_init()
-    bus = dbus.SystemBus()
-
     Deb("pylock getting dbus usage interface")
-    usage_obj = dbus.get_object( 'org.freesmartphone.ousaged', '/org/freesmartphone/Usage' )
+    usage_obj = bus.get_object( 'org.freesmartphone.ousaged', '/org/freesmartphone/Usage' )
     usage_iface = dbus.Interface(usage_obj, 'org.freesmartphone.Usage')
+    Deb("pylock dbus interface test it ["+str(usage_iface.ListResources())+"]")
     Deb("pylock getting dbus usage interface got it :)")
 
     Deb("pylock d_battery")
     d_battery = De_Battery()
     Deb("pylock d_battery.capacity")
     bus.add_signal_receiver(d_battery.capacity, dbus_interface="org.freesmartphone.Device.PowerSupply",     signal_name="Capacity")
-    Deb("pylock d_battery.oevent")
-    bus.add_signal_receiver(d_battery.oevent, dbus_interface="org.freesmartphone.Device.Input",     signal_name="Event")
     Deb("pylock d_battery.oevent")
     bus.add_signal_receiver(d_battery.oevent, dbus_interface="org.freesmartphone.Device.Input",     signal_name="Event")
     Deb("pylock d_battery.callincomming")
