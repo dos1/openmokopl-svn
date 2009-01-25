@@ -110,7 +110,7 @@ for p in fileList:
         Deb("File ["+str(p)+"] add as wallpaper.")
         bg_count+=1
         pix_bg.append( pygame.image.load(p) )
-        break
+        
 
 
 Deb("Loading pixmaps end")
@@ -194,7 +194,6 @@ class LockScreen(threading.Thread):
             if onBattery != onBattery_old:
                 Deb("LockScreen onBattery status change")
                 onBattery_old = onBattery
-                self.repeint()
                 if onBattery == 0:
                     text_charging = font110.render("Charging...", 1, (255,255,255))
                     self.screen.blit( text_charging, \
@@ -204,6 +203,8 @@ class LockScreen(threading.Thread):
                         (GetSurfaceCenter_x(pix_bt_charg), 300 )
                         )
                     pygame.display.flip()
+                else:
+                    self.repeint()
 
 
             event = pygame.event.poll()
