@@ -1,0 +1,18 @@
+[+] done
+[-] not done
+[TODO] hyyy
+[!] note
+
+[TODO] add support for making eleTree*n in one object
+[TODO] add support widget: elementary.toolbox
+[TODO] speed up all parsing process
+
+[+] add support for expand pack / not expand pack
+[+] add get_widget
+[+] add signal_autoconnect
+[+] toogle little cheat ( label Alarm in now:#,#ON#,#OFF#,# ) bla bla bla
+[!] all obiects like: window, expandar, scrollwindow, viewport
+	must have a v or h box as a first element
+[+] supported widgets: button, label, vbox, hbox, window, toggl, scrollwindow,
+	expander (as a elementary.frame), icon, viewport (as a elementary.bouble)
+[+] read and pars glade
