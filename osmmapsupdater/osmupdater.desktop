@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=0.1
+Encoding=UTF-8
+Name=OSMUpdater
+TryExec=osmupdater.py
+GenericName=OSM updater
+Comment=OSM updater for local files
+StartupNotify=true
+Exec=osmupdater.py
+Terminal=false
+Type=Application
+Categories=Settings;
+Icon=OSMUpdater.png
