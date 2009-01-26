@@ -13,11 +13,28 @@ import gtk.glade
 
 import sys
 
+
+try:
+	import mokoui
+	use_mokoui = True
+except:
+	use_mokoui = False
+
+
+try:
+	import illume
+	use_illume = True
+except:
+	use_illume = False
+
+
 def Deb( name ):
 	print "[mb] "+str(time.ctime())+" ["+str(name)+"]"
 
 __author__="yoyo"
 __date__ ="$Jan 19, 2009 4:57:02 PM$"
+
+Deb("extras:\nmokoui:["+str(use_mokoui)+"]\nillume:["+str(use_illume)+"]")
 
 def get_image( wTree, obj, icoStock ):
 	objWid = wTree.get_widget(obj)
@@ -176,7 +193,25 @@ class Mb_view:
 
 	def __initScrolled(self, tv):
 		Deb("mb __initScrolled")
-		return tv
+		if use_mokoui == False:
+			Deb("mb __initScrolled mokoui not present")
+			return tv
+		else:
+			Deb("mb __initScrolled mokoui present")
+
+		tab_content = tv
+		if use_mokoui:
+			self.scrolled = mokoui.FingerScroll()
+		else:
+			self.scrolled = gtk.ScrolledWindow()
+			self.scrolled.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+
+		self.scrolled.show()
+		self.scrolled.add_with_viewport(tab_content)
+
+		Deb("mb __initScrolled end")
+		return self.scrolled
+
 
 	def nr_to_name_buffer(self, nr):
 		Deb("mb nr_to_name_buffer")
@@ -282,6 +317,17 @@ class Mb_view:
 		except:
 			Deb("mb on_button_sms_clicked not selected")
 
+	def on_entry_search_focus_in_event(self, widget, a1 ):
+		Deb("on_entry_search_focus_in_event")
+		if use_illume == True:
+			illume.kbd_show()
+
+	def on_entry_search_focus(self, widget, a1 ):
+		Deb("on_entry_search_focus")
+		if use_illume == True:
+			illume.kbd_show()
+
+
 	def Gui(self):
 		self.win = gtk.Window()
 		gladefile = "mb.glade"
@@ -291,13 +337,16 @@ class Mb_view:
 		self.win.set_title("sms's")
 		hbox_mb = wTree.get_widget('hbox_mb')
 		self.entry_search = wTree.get_widget('entry_search')
+		
 
 		dic = {
 				"on_button_close_clicked" : self.on_button_close_clicked,
 				"on_entry_search_changed" : self.on_entry_search_changed,
 				"on_button_view_clicked" : self.on_button_view_clicked,
 				"on_button_sms_clicked" : self.on_button_sms_clicked,
-				"on_button_search_clean_clicked" : self.on_button_search_clean_clicked
+				"on_button_search_clean_clicked" : self.on_button_search_clean_clicked,
+				"on_entry_search_focus_in_event" : self.on_entry_search_focus_in_event,
+				"on_entry_search_focus" : self.on_entry_search_focus
 			}
 
 		wTree.signal_autoconnect(dic)
@@ -344,6 +393,7 @@ class Mb_view:
 		tvcolumn.add_attribute(cell, 'text', 3)
 		self.treeview.set_search_column(3)
 		tvcolumn.set_sort_column_id(3)
+
 
 
 

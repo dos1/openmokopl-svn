@@ -12,6 +12,7 @@ import time
 import gobject
 import gtk
 
+#opkg install http://downloads.tuxfamily.org/3v1deb/openmoko/python-mokoui2_0.1.0+svnr4342_armv4t.ipk
 
 
 def Deb( name ):

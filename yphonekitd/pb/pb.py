@@ -37,14 +37,12 @@ import gtk
 Deb("after import gtk")
 import gtk.glade
 Deb("after import glade")
-#try:
-#	import mokoui
-#	print "mokoui"
-#	use_mokoui = True
-#except:
-#	print "!mokoui"
-#	use_mokoui = False
-use_mokoui = False
+try:
+	import mokoui
+	use_mokoui = True
+except:
+	use_mokoui = False
+
 
 
 
@@ -78,20 +76,26 @@ def read_pb_casch():
 
 
 class ContactSearch:
-	def __init__(self, gsm_call_iface):
+	def __init__(self, gsm_call_iface, gsm_sim_iface):
 		self.gsm_call_iface = gsm_call_iface
+		self.gsm_sim_iface = gsm_sim_iface
 
 
 	def __initScrolled(self, tv):
 		Deb("pb __initScrolled")
-		return tv
+		if use_mokoui == False:
+			Deb("pb __initScrolled mokoui not present")
+			return tv
+		else:
+			Deb("pb __initScrolled mokoui present")
+
 		tab_content = tv
 		if use_mokoui:
 			self.scrolled = mokoui.FingerScroll()
 		else:
 			self.scrolled = gtk.ScrolledWindow()
 			self.scrolled.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-			
+
 		self.scrolled.show()
 		self.scrolled.add_with_viewport(tab_content)
 
@@ -99,15 +103,25 @@ class ContactSearch:
 		return self.scrolled
 
 	def pb_to_treestore(self, filter = ""):
-	    Deb("pb pb_to_treestore start")
-	    f = 0
-	    filter = filter.lower()
-	    for i in self.pb:
-		if str(i[1]).lower().find(filter) != -1 or str(i[2]).lower().find(filter) != -1 or filter == "":
-	    	    f+=1
-		    self.treestore.append(None, [str(i[0]), str(i[1]), str(i[2])])
+		Deb("pb pb_to_treestore start")
+		if self.tab == 0:
+			self.treestore.clear()
+			list = self.pb
+		elif self.tab == 1:
+			self.treestore_missed.clear()
+			list = self.pb_missed
+
+		f = 0
+		filter = filter.lower()
+		for i in list:
+			if str(i[1]).lower().find(filter) != -1 or str(i[2]).lower().find(filter) != -1 or filter == "":
+				f+=1
+				if self.tab == 0:
+					self.treestore.append(None, [str(i[0]), str(i[1]), str(i[2])])
+				elif self.tab == 1:
+					self.treestore_missed.append(None, [str(i[0]), str(i[1]), str(i[2])])
 		
-	    Deb("pb pb_to_treestore done found:["+str(f)+"]")
+		Deb("pb pb_to_treestore done found:["+str(f)+"]")
 
 
 	def destroy_all(self, widget):
@@ -123,7 +137,11 @@ class ContactSearch:
 	def on_button_call_clicked(self,  widget ):
 		Deb("pb on_button_call_clicked")
 		try:
-			treeselection = self.treeview.get_selection()
+			if self.tab == 0:
+				treeselection = self.treeview.get_selection()
+			elif self.tab == 1:
+				treeselection = self.treeview_missed.get_selection()
+				
 			model, iter = treeselection.get_selected()
 			text = model.get_value(iter, 2)
 			self.gsm_call_iface.Initiate( str(text), 'voice' )
@@ -135,7 +153,11 @@ class ContactSearch:
 	def on_button_sms_clicked(self,  widget ):
 		Deb("pb on_button_sms_clicked")
 		try:
-			treeselection = self.treeview.get_selection()
+			if self.tab == 0:
+				treeselection = self.treeview.get_selection()
+			elif self.tab == 1:
+				treeselection = self.treeview_missed.get_selection()
+				
 			model, iter = treeselection.get_selected()
 			reciver_name = model.get_value(iter, 1)
 			reciver_nr = model.get_value(iter, 2)
@@ -149,11 +171,20 @@ class ContactSearch:
 	def on_button_edit_clicked(self, widget ):
 		Deb("pb on_button_edit_clicked")
 		try:
-			treeselection = self.treeview.get_selection()
-			model, iter = treeselection.get_selected()
-			reciver_id = model.get_value(iter, 0)
-			reciver_name = model.get_value(iter, 1)
-			reciver_nr = model.get_value(iter, 2)
+			if self.tab == 0:
+				treeselection = self.treeview.get_selection()
+				model, iter = treeselection.get_selected()
+				reciver_id = model.get_value(iter, 0)
+				reciver_name = model.get_value(iter, 1)
+				reciver_nr = model.get_value(iter, 2)
+			elif self.tab == 1:
+				treeselection = self.treeview_missed.get_selection()
+				model, iter = treeselection.get_selected()
+				reciver_id = ""
+				reciver_name = str(model.get_value(iter, 1))
+				reciver_nr = str(model.get_value(iter, 2))
+			
+			
 			ce = ContactEdit( self )
 			ce.Gui( reciver_id, reciver_name, reciver_nr )
 		except:
@@ -164,7 +195,6 @@ class ContactSearch:
 
 	def on_entry_search_changed(self,  widget ):
 		Deb("pb on_entry_search_changed str:["+str(widget.get_text())+"]")
-		self.treestore.clear()
 		self.pb_to_treestore( str(widget.get_text()) )
 
 	def on_button_search_clean_clicked(self,  widget ):
@@ -173,8 +203,23 @@ class ContactSearch:
 
 	def pb_casch_to_self(self):
 	    self.pb = read_pb_casch()
-	
+
+	def tv_missed(self,widget,arg1):
+		if self.tab != 0:
+			Deb("tv_missed")
+			self.tab = 0
+
+	def tv_missed_exposure(self,widget,arg1):
+		if self.tab != 1:
+			self.tab = 1
+			Deb("tv_missed_exposure")
+			self.pb_missed = gsm_sim_iface.RetrievePhonebook( 'missed' )
+			self.treestore_missed.clear()
+			for i in self.pb_missed:
+				self.treestore_missed.append( None, [str(i[0]), str(i[1]), str(i[2])] )
+
 	def Gui(self):
+		self.tab = 0
 		Deb("pb Gui")
 				
 		self.win = gtk.Window()
@@ -192,6 +237,7 @@ class ContactSearch:
 		wTree.signal_autoconnect(dic)
 
 		hbox_pb = wTree.get_widget('hbox_pb')
+		hbox_missed = wTree.get_widget("vbox_missed")
 		self.entry_search = wTree.get_widget('entry_search')
 
 		self.treestore = gtk.TreeStore(str, str, str)
@@ -200,17 +246,8 @@ class ContactSearch:
 		self.pb_to_treestore()
 		
 		self.treeview = gtk.TreeView(self.treestore)
-		#self.treeview.connect("cursor-changed", self.cb_scroll)
-		"""
-		tvcolumn = gtk.TreeViewColumn('id')
-		self.treeview.append_column(tvcolumn)
-		cell = gtk.CellRendererText()
-		tvcolumn.pack_start(cell, True)
-		tvcolumn.add_attribute(cell, 'text', 0)
-		self.treeview.set_search_column(0)
-		tvcolumn.set_sort_column_id(0)
-		"""
 		tvcolumn = gtk.TreeViewColumn('Name')
+
 		self.treeview.append_column(tvcolumn)
 		cell = gtk.CellRendererText()
 		#cell.set_property('size-points', 8 )
@@ -229,10 +266,44 @@ class ContactSearch:
 
 		#self.treeview.set_reorderable(True)
 		self.treeview.connect( "cursor-changed", self.scrollToRow )
+		self.treeview.connect( "expose-event", self.tv_missed )
+
 
 		hbox_pb.add( self.__initScrolled( self.treeview ) )
 		self.treeview.show()
+
+
+
+
+
+
+		self.treestore_missed = gtk.TreeStore(str, str, str)
+		self.treeview_missed = gtk.TreeView(self.treestore_missed)
 		
+		tvcolumn = gtk.TreeViewColumn('Name')
+		self.treeview_missed.append_column(tvcolumn)
+		cell = gtk.CellRendererText()
+		#cell.set_property('size-points', 8 )
+		tvcolumn.pack_start(cell, True)
+		tvcolumn.add_attribute(cell, 'text', 1)
+		self.treeview_missed.set_search_column(1)
+		tvcolumn.set_sort_column_id(1)
+
+		tvcolumn = gtk.TreeViewColumn('Tel')
+		self.treeview_missed.append_column(tvcolumn)
+		cell = gtk.CellRendererText()
+		tvcolumn.pack_start(cell, True)
+		tvcolumn.add_attribute(cell, 'text', 2)
+		self.treeview_missed.set_search_column(2)
+		tvcolumn.set_sort_column_id(2)
+
+
+		self.treeview_missed.connect( "expose-event", self.tv_missed_exposure )
+		hbox_missed.add( self.__initScrolled( self.treeview_missed ) )
+		self.treeview_missed.show()
+		
+
+
 		self.win.connect('destroy', self.on_button_pb_clicked)
 		Deb("pb Gui obj redy need to show_all")
 		self.win.show()
@@ -355,7 +426,7 @@ if __name__ == "__main__":
 			time.sleep(5)
 
 	Deb("__name__ init main gui")
-	cs = ContactSearch( gsm_call_iface )
+	cs = ContactSearch( gsm_call_iface, gsm_sim_iface )
 	cs.Gui()
 	Deb("__name__ init main gui done")
 	
