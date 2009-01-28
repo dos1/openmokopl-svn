@@ -9,8 +9,14 @@ http://d3p.pl/fb/?subPage=na_tapecie&tag=eleGlade
 
 
 [TODO] add support for making eleTree*n in one object
-[TODO] add support widget: elementary.toolbox
 [TODO] speed up all parsing process
+
+
+[+] add support for entrytext
+[1/2] add support widget: elementary.toolbox problem add from autoconnect
+	signal callbacks :/ toolbar present but unusfull :/ no callbacks :/
+
+
 
 [+] add support for expand pack / not expand pack
 [+] add get_widget

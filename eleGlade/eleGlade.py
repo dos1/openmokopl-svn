@@ -103,6 +103,17 @@ def eleLabel( path, parentObj ):
 	lb.show()
 	return lb
 
+def eleEntry( path, parentObj ):
+	tr = elementary.Entry( parentObj )
+	tr.single_line_set(True)
+	tr.entry_set(getPropertyFromWidget(path[0].parentNode, "text"))
+	#tr.label_set(searchForLabel(path))
+	tr = packing ( tr, path )
+	tr.show()
+	return tr
+
+
+
 def eleToggle( path, parentObj ):
 	tr = elementary.Toggle( parentObj)
 	label = searchForLabel(path).split("#,#")
@@ -116,6 +127,7 @@ def eleToggle( path, parentObj ):
 		off = "0"
 	tr.states_labels_set(on,off)
 	tr.show()
+
 	return tr
 
 
@@ -169,6 +181,59 @@ def eleBubble( path, parentObj ):
 	tr = elementary.Bubble( parentObj )
 	tr = packing ( tr, path )
 	tr.show()
+	return tr
+
+
+
+def eleToolbar( path, parentObj ):
+	tr = elementary.Toolbar( parentObj )
+	tr = packing ( tr, path )
+	tr.show()
+
+
+	Deb("---------------------")
+	for c in path:
+		if str(c.localName) == "child":
+			for w in c.childNodes:
+				if str(w.localName) == "widget":
+					item_label = str( getPropertyFromWidget(w, "label") )
+					item_ico = str( getPropertyFromWidget(w, "icon") )
+					item_name = w.getAttribute("id")
+					for b in w.childNodes:
+						Deb( "b localName"+str(b.localName) )
+						if str(b.localName) == "signal":
+							item_sigName = b.getAttribute("name")
+							item_handler = b.getAttribute("handler")
+							print "item_handler:"+str(item_handler)
+							"""objectsSignalsList.append(
+								[ item_name, b.getAttribute("name"),
+									b.getAttribute("handler")] )
+							"""
+
+
+					img = elementary.Icon( parentObj )
+					img.file_set( item_ico )
+					img.show()
+
+					tr.item_add(
+						img,
+						item_label,
+						item_handler
+						)
+
+
+	"""
+	img = elementary.Icon( parentObj )
+	img.file_set("osmupdater.png")
+	img.show()
+
+	tr.item_add(
+		img,
+		"se text",
+		"clicked"
+		)
+	"""
+
 	return tr
 
 window = 0
@@ -274,6 +339,22 @@ def buildElementsFromXml( g, parentName = "", parentObj = "", frameParent = "" )
 				else:
 					parentObj.pack_end( lb )
 
+			if _class == "GtkEntry":
+				en = eleEntry(i.childNodes, parentObj)
+				objectsList.append( [str(_id),en])
+				if frameParent == 1:
+					parentObj.content_set( en )
+				else:
+					parentObj.pack_end( en )
+
+			if _class == "GtkToolbar":
+				tb = eleToolbar(i.childNodes, parentObj)
+				objectsList.append( [str(_id),tb])
+				if frameParent == 1:
+					parentObj.content_set( tb )
+				else:
+					parentObj.pack_end( tb )
+			
 			if _class == "GtkToggleButton":
 				tb = eleToggle( i.childNodes, parentObj)
 				objectsList.append( [str(_id),tb])
@@ -296,6 +377,7 @@ class eTree:
 					
 		except:
 			return None
+
 
 	def signal_autoconnect( self, dic ):
 		for d in dic:
