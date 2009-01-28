@@ -33,9 +33,7 @@ def getPropertyFromWidget( p, name ):
 				return str(b.childNodes[0].nodeValue)
 	return ""
 
-def getSignalFromWidget( p, objName ):
-	global objectsSignalsList
-
+def getSignalFromWidget( window, objectsList, objectsSignalsList,  p, objName ):
 	for b in p.childNodes:
 		Deb( "getSignalFromWidget: localName"+str(b.localName) )
 		if str(b.localName) == "signal":
@@ -95,6 +93,7 @@ def eleButton( path, parentObj ):
 	bt = packing( bt, path )
 	bt.show()
 	return bt
+
 
 def eleLabel( path, parentObj ):
 	lb = elementary.Label( parentObj )
@@ -236,14 +235,7 @@ def eleToolbar( path, parentObj ):
 
 	return tr
 
-window = 0
-
-objectsList = []
-objectsSignalsList = []
-
-
-
-def buildElementsFromXml( g, parentName = "", parentObj = "", frameParent = "" ):
+def buildElementsFromXml( window, objectsList, objectsSignalsList, g, parentName = "", parentObj = "", frameParent = "" ):
 	Deb( "parsing child " )
 	for i in g.childNodes:
 		if i.localName == "widget":
@@ -256,14 +248,14 @@ def buildElementsFromXml( g, parentName = "", parentObj = "", frameParent = "" )
 			if _class == "GtkWindow":
 				win = eleWindow( i.childNodes, _id )
 				objectsList.append( [str(_id),win ] )
-				getSignalFromWidget( i, str(_id) )
+				getSignalFromWidget( window, objectsList, objectsSignalsList, i, str(_id) )
 				bg = elementary.Background(win)
 				win.resize_object_add(bg)
 				bg.size_hint_weight_set(1.0, 1.0)
 				bg.show()
 
 				for s in i.childNodes:
-					buildElementsFromXml( s, _id , win )
+					buildElementsFromXml( window, objectsList, objectsSignalsList, s, _id , win )
 
 			if _class == "GtkVBox":
 				vbox = eleVBox( i.childNodes, parentObj )
@@ -271,7 +263,6 @@ def buildElementsFromXml( g, parentName = "", parentObj = "", frameParent = "" )
 				if frameParent == 1:
 					parentObj.content_set( vbox )
 				else:
-					global window
 					if window == 0:
 						parentObj.resize_object_add( vbox )
 						window = 1
@@ -279,7 +270,7 @@ def buildElementsFromXml( g, parentName = "", parentObj = "", frameParent = "" )
 						parentObj.pack_end( vbox )
 
 				for s in i.childNodes:
-					buildElementsFromXml( s, parentName , vbox )
+					buildElementsFromXml( window, objectsList, objectsSignalsList, s, parentName , vbox )
 
 
 			if _class == "GtkHBox":
@@ -290,7 +281,7 @@ def buildElementsFromXml( g, parentName = "", parentObj = "", frameParent = "" )
 				else:
 					parentObj.pack_end( hbox )
 				for s in i.childNodes:
-					buildElementsFromXml( s, parentName , hbox )
+					buildElementsFromXml( window, objectsList, objectsSignalsList, s, parentName , hbox )
 
 			if _class == "GtkScrolledWindow":
 				sc = eleScroller( i.childNodes, parentObj )
@@ -300,7 +291,7 @@ def buildElementsFromXml( g, parentName = "", parentObj = "", frameParent = "" )
 				else:
 					parentObj.pack_end( sc )
 				for s in i.childNodes:
-					buildElementsFromXml( s, parentName , sc, 1 )
+					buildElementsFromXml( window, objectsList, objectsSignalsList, s, parentName , sc, 1 )
 
 
 			if _class == "GtkExpander":
@@ -310,13 +301,13 @@ def buildElementsFromXml( g, parentName = "", parentObj = "", frameParent = "" )
 
 				s = i.childNodes[5]
 				Deb(  "expander: "+str(s.localName) )
-				buildElementsFromXml( s, parentName , exp, 1 )
+				buildElementsFromXml( window, objectsList, objectsSignalsList, s, parentName , exp, 1 )
 
 
 			if _class == "GtkButton":
 				bt = eleButton(i.childNodes, parentObj)
 				objectsList.append( [str(_id),bt])
-				getSignalFromWidget( i, str(_id) )
+				getSignalFromWidget( window, objectsList, objectsSignalsList, i, str(_id) )
 				parentObj.pack_end( bt )
 
 			if _class == "GtkImage":
@@ -329,7 +320,7 @@ def buildElementsFromXml( g, parentName = "", parentObj = "", frameParent = "" )
 				objectsList.append( [str(_id),vp])
 				parentObj.pack_end( vp )
 				for s in i.childNodes:
-					buildElementsFromXml( s, parentName , vp, 1 )
+					buildElementsFromXml( window, objectsList, objectsSignalsList, s, parentName , vp, 1 )
 
 			if _class == "GtkLabel":
 				lb = eleLabel(i.childNodes, parentObj)
@@ -358,7 +349,7 @@ def buildElementsFromXml( g, parentName = "", parentObj = "", frameParent = "" )
 			if _class == "GtkToggleButton":
 				tb = eleToggle( i.childNodes, parentObj)
 				objectsList.append( [str(_id),tb])
-				getSignalFromWidget( i, str(_id) )
+				getSignalFromWidget( window, objectsList, objectsSignalsList, i, str(_id) )
 				parentObj.pack_end( tb )
 
 	Deb( "parsing child done" )
@@ -401,11 +392,15 @@ def XML(filename):
 	doc = xml.dom.minidom.parse( filename )
 	elementary.init()
 	glade = doc.getElementsByTagName("glade-interface")
-	for i in glade:
-		buildElementsFromXml( i )
 
-	global objectsList
-	global objectsSignalsList
+	window = 0
+	objectsList = []
+	objectsSignalsList = []
+
+	for i in glade:
+		buildElementsFromXml( window, objectsList, objectsSignalsList, i )
+
+	
 	Deb( objectsSignalsList )
 	return eTree( objectsList, objectsSignalsList )
 

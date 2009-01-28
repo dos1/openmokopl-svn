@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.4.5 on Wed Jan 28 12:12:44 2009 -->
+<!--Generated with glade3 3.4.5 on Wed Jan 28 13:00:43 2009 -->
 <glade-interface>
   <widget class="GtkWindow" id="window1">
     <signal name="destroy" handler="on_window1_destroy"/>
@@ -101,7 +101,13 @@
           </packing>
         </child>
         <child>
-          <placeholder/>
+          <widget class="GtkLabel" id="label1">
+            <property name="visible">True</property>
+            <property name="label" translatable="yes">label</property>
+          </widget>
+          <packing>
+            <property name="position">5</property>
+          </packing>
         </child>
         <child>
           <placeholder/>
