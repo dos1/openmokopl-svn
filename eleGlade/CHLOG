@@ -11,6 +11,7 @@ http://d3p.pl/fb/?subPage=na_tapecie&tag=eleGlade
 [TODO] speed up all parsing process
 
 
+[+] ~20% faster
 [+] add support for making eleTree*n in one object
 	multi eleGlade objects is same function :)
 [+] add support for entrytext

@@ -5,6 +5,7 @@ __date__ ="$Jan 22, 2009 11:03:36 PM$"
 import os,sys,time
 tStart = time.time()
 def Deb( s ):
+	#pass
 	print "[eleGlade] ["+str( time.time()-tStart )+"] ["+str(s)+"]"
 
 Deb("after import os,sys,time")
@@ -27,16 +28,16 @@ Deb("after import xml,....")
 
 def getPropertyFromWidget( p, name ):
 	for b in p.childNodes:
-		Deb("getPropertyFromWidget: localName"+str(b.localName) )
 		if str(b.localName) == "property":
+			#Deb("getPropertyFromWidget: localName"+str(b.localName) )
 			if b.getAttribute("name") == name:
 				return str(b.childNodes[0].nodeValue)
 	return ""
 
 def getSignalFromWidget( window, objectsList, objectsSignalsList,  p, objName ):
 	for b in p.childNodes:
-		Deb( "getSignalFromWidget: localName"+str(b.localName) )
 		if str(b.localName) == "signal":
+			#Deb( "getSignalFromWidget: localName"+str(b.localName) )
 			objectsSignalsList.append( [ objName, b.getAttribute("name"), b.getAttribute("handler")] )
 
 
@@ -52,10 +53,10 @@ def packing( obj, path ):
 				if str(p.localName) == "property":
 					if str(p.getAttribute("name")) == "expand":
 						if p.childNodes[0].nodeValue == "False":
-							print "packing expand false"
+							Deb("packing expand false")
 							obj.size_hint_weight_set(-1.0, -1.0)
 						else:
-							print "packing expand true"
+							Deb( "packing expand true" )
 							obj.size_hint_weight_set(1.0, 1.0)
 	return obj
 
@@ -137,7 +138,7 @@ def eleFrame( path, parentObj ):
 	child = 0
 	for i in path:
 		if str(i.localName) == "property":
-			print str(i.getAttribute("name") )
+			Deb("eleFrame:["+str(i.getAttribute("name") )+"]")
 
 		if str(i.localName) == "child" and child == 0:
 			child+=1
@@ -148,7 +149,7 @@ def eleFrame( path, parentObj ):
 
 
 
-	print "-------------- frame --------------------"
+	Deb( "-------------- frame --------------------" )
 
 	fr = packing ( fr, path )
 	fr.show()
@@ -184,13 +185,11 @@ def eleBubble( path, parentObj ):
 
 
 
-def eleToolbar( path, parentObj ):
+def eleToolbar( window, objectsList, objectsSignalsList, path, parentObj ):
 	tr = elementary.Toolbar( parentObj )
 	tr = packing ( tr, path )
 	tr.show()
 
-
-	Deb("---------------------")
 	for c in path:
 		if str(c.localName) == "child":
 			for w in c.childNodes:
@@ -199,25 +198,29 @@ def eleToolbar( path, parentObj ):
 					item_ico = str( getPropertyFromWidget(w, "icon") )
 					item_name = w.getAttribute("id")
 					for b in w.childNodes:
-						Deb( "b localName"+str(b.localName) )
+						#Deb( "b localName"+str(b.localName) )
 						if str(b.localName) == "signal":
 							item_sigName = b.getAttribute("name")
 							item_handler = b.getAttribute("handler")
-							print "item_handler:"+str(item_handler)
-							"""objectsSignalsList.append(
-								[ item_name, b.getAttribute("name"),
-									b.getAttribute("handler")] )
-							"""
-
+							#Deb("eleToolbar item_handler:"+str(item_handler) )
+							break
 
 					img = elementary.Icon( parentObj )
 					img.file_set( item_ico )
 					img.show()
 
+					objectsList.append(
+						[ item_name, img ]
+						)
+					objectsSignalsList.append(
+						[ item_name, item_sigName, item_handler]
+						)
+
+
 					tr.item_add(
 						img,
 						item_label,
-						item_handler
+						None
 						)
 
 
@@ -236,7 +239,7 @@ def eleToolbar( path, parentObj ):
 	return tr
 
 def buildElementsFromXml( window, objectsList, objectsSignalsList, g, parentName = "", parentObj = "", frameParent = "" ):
-	Deb( "parsing child " )
+	#Deb( "parsing child " )
 	for i in g.childNodes:
 		if i.localName == "widget":
 			_class = i.getAttribute("class")
@@ -339,7 +342,7 @@ def buildElementsFromXml( window, objectsList, objectsSignalsList, g, parentName
 					parentObj.pack_end( en )
 
 			if _class == "GtkToolbar":
-				tb = eleToolbar(i.childNodes, parentObj)
+				tb = eleToolbar( window, objectsList, objectsSignalsList,  i.childNodes, parentObj)
 				objectsList.append( [str(_id),tb])
 				if frameParent == 1:
 					parentObj.content_set( tb )
@@ -352,7 +355,7 @@ def buildElementsFromXml( window, objectsList, objectsSignalsList, g, parentName
 				getSignalFromWidget( window, objectsList, objectsSignalsList, i, str(_id) )
 				parentObj.pack_end( tb )
 
-	Deb( "parsing child done" )
+	#Deb( "parsing child done" )
 
 class eTree:
 	def __init__( self, objList, objSignalsList ):
@@ -374,7 +377,9 @@ class eTree:
 		for d in dic:
 			for s in self.objSignalsList:
 				if str(s[2]) == d:
+					Deb( "signal_autoconnect: [objname:"+str(s[0])+" signal:"+str(s[1])+" handler:"+str(s[2])+"]" )
 					obj = self.get_widget(s[0])
+					#print str(obj)
 					if s[1] == "clicked":
 						obj.clicked = dic[d]
 					elif s[1] == "toggled":
@@ -389,9 +394,13 @@ class eTree:
 
 
 def XML(filename):
+	Deb("XML start")
 	doc = xml.dom.minidom.parse( filename )
+	Deb("XML doc")
 	elementary.init()
+	Deb("XML init")
 	glade = doc.getElementsByTagName("glade-interface")
+	Deb("XML glade")
 
 	window = 0
 	objectsList = []
@@ -401,7 +410,9 @@ def XML(filename):
 		buildElementsFromXml( window, objectsList, objectsSignalsList, i )
 
 	
-	Deb( objectsSignalsList )
+	Deb( "objectsSignalsList: ["+str(objectsSignalsList)+"]" )
+	Deb( "objectsList: ["+str(objectsList)+"]" )
+	Deb("XML end")
 	return eTree( objectsList, objectsSignalsList )
 
 
