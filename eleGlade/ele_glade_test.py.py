@@ -42,6 +42,7 @@ if __name__ == "__main__":
 	eleTree = eleGlade.XML(eleGladeFile)
 	win = eleTree.get_widget("window1")
 	label1 = eleTree.get_widget("label1")
+	entry2 = eleTree.get_widget("entry2")
 	dic = {
 		"on_window1_destroy" : on_window1_destroy		
 		}
@@ -49,6 +50,8 @@ if __name__ == "__main__":
 
 	label1.label_set("buuuu click<br> deam you")
 	label1._callback_add("clicked", clicked)
+	entry2.entry_set("ala<br>ma kota<br>a kot ma ale")
+	entry2.changed = clikDic
 
 	win.show()
 

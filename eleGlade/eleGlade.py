@@ -2,15 +2,18 @@
 __author__="yoyo"
 __date__ ="$Jan 22, 2009 11:03:36 PM$"
 
+import os,sys,time
+tStart = time.time()
+def Deb( s ):
+	print "[eleGlade] ["+str( time.time()-tStart )+"] ["+str(s)+"]"
+
+Deb("after import os,sys,time")
 
 import elementary
-
-import os,sys,time
-
 import pprint
-
 import xml.dom.minidom
 from xml.dom.minidom import Node
+Deb("after import xml,....")
 
 """
 <raster> set align for label to 0.5 0.5
@@ -21,9 +24,6 @@ from xml.dom.minidom import Node
 <raster> 0.0-1.0 is alignment (left to right, top to bottom)
 <raster> 0.5 of course is centered
 """
-tStart = time.time()
-def Deb( s ):
-	print "[eleGlade] ["+str( time.time()-tStart )+"] ["+str(s)+"]"
 
 def getPropertyFromWidget( p, name ):
 	for b in p.childNodes:
