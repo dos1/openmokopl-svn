@@ -106,13 +106,22 @@ def eleLabel( path, parentObj ):
 def eleEntry( path, parentObj ):
 	tr = elementary.Entry( parentObj )
 	tr.single_line_set(True)
+	#tr.single_line_set(False)
 	tr.entry_set(getPropertyFromWidget(path[0].parentNode, "text"))
 	#tr.label_set(searchForLabel(path))
 	tr = packing ( tr, path )
 	tr.show()
 	return tr
 
-
+def eleTextView( path, parentObj ):
+	tr = elementary.Entry( parentObj )
+	tr.single_line_set(True)
+	tr.single_line_set(False)
+	tr.entry_set(getPropertyFromWidget(path[0].parentNode, "text").replace("\n","<br>"))
+	#tr.label_set(searchForLabel(path))
+	tr = packing ( tr, path )
+	tr.show()
+	return tr
 
 def eleToggle( path, parentObj ):
 	tr = elementary.Toggle( parentObj)
@@ -340,6 +349,15 @@ def buildElementsFromXml( window, objectsList, objectsSignalsList, g, parentName
 					parentObj.content_set( en )
 				else:
 					parentObj.pack_end( en )
+
+			if _class == "GtkTextView":
+				en = eleTextView(i.childNodes, parentObj)
+				objectsList.append( [str(_id),en])
+				if frameParent == 1:
+					parentObj.content_set( en )
+				else:
+					parentObj.pack_end( en )
+
 
 			if _class == "GtkToolbar":
 				tb = eleToolbar( window, objectsList, objectsSignalsList,  i.childNodes, parentObj)

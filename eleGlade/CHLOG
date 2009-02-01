@@ -12,6 +12,7 @@ http://d3p.pl/fb/?subPage=na_tapecie&tag=eleGlade
 [TODO] make toolbar work correctly
 
 
+[+] add text entry multiline
 [+] ~20% faster
 [+] add support for making eleTree*n in one object
 	multi eleGlade objects is same function :)
