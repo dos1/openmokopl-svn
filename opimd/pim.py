@@ -55,6 +55,7 @@ def add(data):
   dict = prepare_dict(data)
   print "Adding item " + str(dict) + " using " + default_backend(domain+'s') + " backend..."
   interface.Add(dict)  
+  query(data)
 
 def edit(id, data):
   check_args(data)
@@ -62,6 +63,7 @@ def edit(id, data):
   print "Editing item " + str(id) + " using data: " + str(dict) + "..."
   item_interface = getDbusObject ( bus, "org.freesmartphone.opimd", "/org/freesmartphone/PIM/"+domain+"s/"+id, "org.freesmartphone.PIM."+domain)
   item_interface.Update(dict)
+  query(data)
 
 def delete(id):
   print "Deleting item " + str(id) + "..."
