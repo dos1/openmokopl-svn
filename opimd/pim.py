@@ -46,7 +46,7 @@ def query(data):
     results = query.GetResult()
     for field in results:
       if results[field]!='':
-        print field+": "+str(results[field])
+        print "  "+field+": "+str(results[field])
     query.Skip(0) # skips one result. Skip(1) will skip two results, etc.
 
 
