@@ -34,7 +34,7 @@ bus = dbus.SystemBus()
 sources = getDbusObject (bus, "org.freesmartphone.opimd", "/org/freesmartphone/PIM/Sources", "org.freesmartphone.PIM.Sources")
 init=False
 try:
-  if argv[2]=='init':
+  if argv[1]=='init':
     init=True
 except:
   pass
