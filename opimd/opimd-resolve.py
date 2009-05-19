@@ -6,9 +6,11 @@ def resolve_phone(number):
   x = contacts.Query({'Phone':number.strip('tel:')})
   query = getDbusObject (bus, "org.freesmartphone.opimd", x, "org.freesmartphone.PIM.ContactQuery")
   if query.GetResultCount()==1:
-    return query.GetResult()['Name']
+    name = query.GetResult()['Name']
   else:
-    return "nothing"
+    name = "nothing"
+  query.Dispose()
+  return name
 
 def getDbusObject (bus, busname , objectpath , interface):
   dbusObject = bus.get_object(busname, objectpath)

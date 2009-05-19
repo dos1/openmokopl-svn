@@ -36,7 +36,7 @@ init=False
 try:
   if argv[1]=='init':
     print "Init entries..."
-    sources.InitAllEntries()
+    sources.InitAllEntries() # we shouldn't need it
 except IndexError:
   pass
 
@@ -72,6 +72,8 @@ box.size_hint_align_set(-1.0, -1.0)
 scroll.content_set(box)
 
 results = query.GetMultipleResults(total_results)
+
+query.Dispose()
 
 for i in results:
   #print "Result nr "+str(i+1)+":"
