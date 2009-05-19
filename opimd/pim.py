@@ -48,7 +48,7 @@ def query(data):
       if results[field]!='':
         print "  "+field+": "+str(results[field])
     query.Skip(0) # skips one result. Skip(1) will skip two results, etc.
-
+  query.Dispose() # delete query result from memory
 
 def add(data):
   check_args(data)
