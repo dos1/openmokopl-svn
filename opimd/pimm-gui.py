@@ -3,6 +3,7 @@
 
 import dbus
 from sys import argv
+from functools import partial
 import elementary
 
 cache = {}
@@ -20,6 +21,12 @@ def resolve_phone(number):
     cache[number] = name
     return name
 
+def delete_msg(path, bubble, button, event, *args, **kwargs):
+  message = getDbusObject (bus, "org.freesmartphone.opimd", path, "org.freesmartphone.PIM.Message")
+  message.Delete()
+  bubble.delete()
+  button.delete()
+
 def destroy(obj, event, *args, **kargs):
   print "kabum"
   elementary.exit()
@@ -36,7 +43,7 @@ init=False
 try:
   if argv[1]=='init':
     print "Init entries..."
-    sources.InitAllEntries() # we shouldn't need it
+    sources.InitAllEntries()
 except IndexError:
   pass
 
@@ -62,6 +69,7 @@ bg.show()
 scroll = elementary.Scroller(win)
 win.resize_object_add(scroll)
 scroll.show()
+scroll.bounce_set(0, 1)
 
 box = elementary.Box(win)
 box.show()
@@ -72,8 +80,6 @@ box.size_hint_align_set(-1.0, -1.0)
 scroll.content_set(box)
 
 results = query.GetMultipleResults(total_results)
-
-query.Dispose()
 
 for i in results:
   #print "Result nr "+str(i+1)+":"
@@ -92,6 +98,12 @@ for i in results:
   bubble.size_hint_weight_set(1.0, 0.0)
   bubble.size_hint_align_set(-1.0, -1.0)
 
+  deletebutton = elementary.Button(win)
+  deletebutton.label_set("Delete")
+  deletebutton.clicked = partial(delete_msg, results[i]['Path'], bubble)
+  deletebutton.show()
+
+  box.pack_start(deletebutton)
   box.pack_start(bubble)
 
 print "Finished" # finito, fertig, koniec etc.
