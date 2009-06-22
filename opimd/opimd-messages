@@ -57,7 +57,7 @@ def render_message(message):
   text.text_set(message['Text'])
   text.show()
 
-  timestamp = '0:00'
+  timestamp = ''
 
   if message['Direction']=='in':
     number = message['Sender']
@@ -99,7 +99,7 @@ def render_message(message):
   hbox.horizontal_set(1)
   hbox.show()
 
-  if results[i]['Direction']=='in':
+  if message['Direction']=='in':
     replybutton = elementary.Button(win)
     replybutton.label_set("Reply")
     replybutton.clicked = partial(opimd_reply.reply, bus, [number, name], win, None)
