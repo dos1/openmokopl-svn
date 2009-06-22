@@ -5,15 +5,23 @@ def getDbusObject (bus, busname , objectpath , interface):
         dbusObject = bus.get_object(busname, objectpath)
         return dbus.Interface(dbusObject, dbus_interface=interface)
 
+def dbus_sms_ok(a, b):
+  print a
+  print b
+
+def dbus_opimd_ok(func, x):
+  if callable(func):
+    func(x)
+
+def dbus_err(x):
+  print "dbus error! "+str(x)
 
 def send_msg(bus, to, entry, inwin, func, *args, **kwargs):
   ogsmd = getDbusObject (bus, "org.freesmartphone.ogsmd", "/org/freesmartphone/GSM/Device", "org.freesmartphone.GSM.SMS")
   msg = entry.entry_get().replace('<br>','')
-  ogsmd.SendMessage(to[0].replace('tel:','') ,msg, {})
+  ogsmd.SendMessage(to[0].replace('tel:','') ,msg, {}, reply_handler=dbus_sms_ok, error_handler=dbus_err)
   messages = getDbusObject (bus, "org.freesmartphone.opimd", "/org/freesmartphone/PIM/Messages", "org.freesmartphone.PIM.Messages")
-  message_path = messages.Add({'Recipient':to[0],'Direction':'out','Folder':'SMS','Text':msg})
-  if callable(func):
-    func(message_path)
+  messages.Add({'Recipient':to[0],'Direction':'out','Folder':'SMS','Text':msg}, reply_handler=partial(dbus_opimd_ok, func), error_handler=dbus_err)
   inwin.delete()
 
 def inwindelete(win, *args, **kwargs):
