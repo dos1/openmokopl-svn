@@ -4,6 +4,7 @@
 import dbus, e_dbus
 from sys import argv
 from os import system
+from time import sleep
 from functools import partial
 from opimd_utils import opimd_reply
 import elementary
@@ -42,8 +43,15 @@ def getDbusObject (bus, busname , objectpath , interface):
 
 bus = dbus.SystemBus(mainloop = e_dbus.DBusEcoreMainLoop())
 
-messages = getDbusObject (bus, "org.freesmartphone.opimd", "/org/freesmartphone/PIM/Messages", "org.freesmartphone.PIM.Messages")
-contacts = getDbusObject (bus, "org.freesmartphone.opimd", "/org/freesmartphone/PIM/Contacts", "org.freesmartphone.PIM.Contacts")
+initialized = False
+while (not initialized):  
+  try:
+    messages = getDbusObject (bus, "org.freesmartphone.opimd", "/org/freesmartphone/PIM/Messages", "org.freesmartphone.PIM.Messages")
+    contacts = getDbusObject (bus, "org.freesmartphone.opimd", "/org/freesmartphone/PIM/Contacts", "org.freesmartphone.PIM.Contacts")
+    initialized = True
+  except:
+    print "Init failed"
+    sleep(10)
 
 elementary.init()
 
@@ -166,7 +174,7 @@ def incoming_message(x):
     read.clicked = partial(show_msg, textbox, bubble)
 
     read.show()
-    replybtn.clicked = partial(opimd_reply.reply, bus, [number, name], win, incoming_message)
+    replybtn.clicked = partial(opimd_reply.reply, [number, name], '', bus, win, incoming_message, win.show)
     bubble.content_set(read)
   else:
     bubble.corner_set("top_right")

@@ -102,7 +102,7 @@ def render_message(message):
   if message['Direction']=='in':
     replybutton = elementary.Button(win)
     replybutton.label_set("Reply")
-    replybutton.clicked = partial(opimd_reply.reply, bus, [number, name], win, None)
+    replybutton.clicked = partial(opimd_reply.reply, [number, name], '', bus, win, None, None)
     replybutton.show()
     replybutton.size_hint_weight_set(0.0, 0.0)
     replybutton.size_hint_align_set(0.0, -1.0)
@@ -160,7 +160,7 @@ box.size_hint_align_set(-1.0, -1.0)
 
 scroll.content_set(box)
 
-#total_results = 1
+#total_results = 10
 results = query.GetMultipleResults(total_results)
 
 for i in results:
