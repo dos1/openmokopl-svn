@@ -5,7 +5,7 @@ import dbus, e_dbus
 from sys import argv
 from functools import partial
 import elementary
-import opimd_reply
+from opimd_utils import opimd_reply
 
 cache = {}
 

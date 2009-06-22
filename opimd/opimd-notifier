@@ -5,7 +5,7 @@ import dbus, e_dbus
 from sys import argv
 from os import system
 from functools import partial
-import opimd_reply
+from opimd_utils import opimd_reply
 import elementary
 
 MESSAGES_ICON              = "/usr/share/icons/shr/86x86/apps/openmoko-messages.png"
