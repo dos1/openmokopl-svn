@@ -1,2 +1,2 @@
 #!/bin/sh
-DISPLAY=:0 /home/root/incoming-pimm.py &
+DISPLAY=:0 opimd-notifier &
