@@ -11,7 +11,9 @@ def send_msg(bus, to, entry, inwin, func, *args, **kwargs):
   msg = entry.entry_get().replace('<br>','')
   ogsmd.SendMessage(to[0].replace('tel:','') ,msg, {})
   messages = getDbusObject (bus, "org.freesmartphone.opimd", "/org/freesmartphone/PIM/Messages", "org.freesmartphone.PIM.Messages")
-  func(messages.Add({'Recipient':to[0],'Direction':'out','Folder':'SMS','Text':msg}))
+  message_path = messages.Add({'Recipient':to[0],'Direction':'out','Folder':'SMS','Text':msg})
+  if callable(func):
+    func(message_path)
   inwin.delete()
 
 def inwindelete(win, *args, **kwargs):
