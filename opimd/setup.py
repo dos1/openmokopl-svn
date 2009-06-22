@@ -20,6 +20,7 @@ dist = setup( name='opimd-utils',
     license='GNU GPL',
     packages=['opimd_utils'],
     scripts=['opimd-cli', 'opimd-notifier', 'opimd-messages', 'opimd-resolve', 'opimd-config'],
+    data_files=[('applications', ['data/opimd-messages.desktop'])]
 )
 
 installCmd = dist.get_command_obj(command="install_data")
