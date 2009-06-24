@@ -57,7 +57,7 @@ elementary.init()
 
 elementary.c_elementary.finger_size_set(90)
 
-def show_msg(text, bubble, obj, event, *args, **kwargs):
+def show_msg(text, bubble, obj, *args, **kwargs):
   obj.delete()
   bubble.content_set(text)
   text.show()
@@ -178,7 +178,7 @@ def incoming_message(x):
 
       read = elementary.Button(win)
       read.label_set("New message arrived!")
-      read.clicked = partial(show_msg, textbox, bubble)
+      read.clicked = partial(show_msg, textbox, bubble, read)
 
       read.show()
       replybtn.clicked = partial(opimd_reply.reply, [number, name], '', bus, win, incoming_message, win.show)

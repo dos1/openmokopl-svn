@@ -1,3 +1,4 @@
+
 import elementary, dbus
 from functools import partial
 
@@ -5,19 +6,35 @@ def getDbusObject (bus, busname , objectpath , interface):
         dbusObject = bus.get_object(busname, objectpath)
         return dbus.Interface(dbusObject, dbus_interface=interface)
 
-def dbus_sms_ok(a, b):
-  print a
-  print b
+def dbus_ok():
+  pass
 
-def dbus_opimd_ok(func, x):
-  if callable(func):
-    func(x)
+def dbus_err(x):
+  print "notice: dbus error: "+str(x)
+
+def dbus_sms_ok(x, bus, a, b):
+  message = getDbusObject (bus, "org.freesmartphone.opimd", x, "org.freesmartphone.PIM.Message")
+  data = {'MessageSent':1, 'Processing':0, '_sms_message-reference':a}
+  message.Update(data, reply_handler=dbus_ok, error_handler=dbus_err)
+#  print a
+#  print b
+
+def dbus_opimd_ok(to, msg, props, bus, win, func_ok, func_err, x):
+  if callable(func_ok):
+    func_ok(x)
+  ogsmd = getDbusObject (bus, "org.freesmartphone.ogsmd", "/org/freesmartphone/GSM/Device", "org.freesmartphone.GSM.SMS")
+
+  ogsmd.SendMessage(to[0].replace('tel:','') ,msg, props, reply_handler=partial(dbus_sms_ok, x, bus), error_handler=partial(dbus_gsm_err, to, msg, props, x, bus, win, func_ok, func_err) )
 
 def retry_msg(to, text, bus, win, inwin, func_ok, func_err, *args, **kwargs ):
   inwindelete(inwin)
   reply(to, text, bus, win, func_ok, func_err)
 
-def dbus_gsm_err(to, text, bus, win, func_ok, func_err, x):
+def dbus_gsm_err(to, text, props, x, bus, win, func_ok, func_err, dx):
+  message = getDbusObject (bus, "org.freesmartphone.opimd", x, "org.freesmartphone.PIM.Message")
+  data = {'Processing':0}
+  message.Update(data, reply_handler=dbus_ok, error_handler=dbus_err)
+
   inwin = elementary.InnerWindow(win)
   inwin.show()
   inwin.style_set("vertical-minimal")
@@ -33,7 +50,7 @@ def dbus_gsm_err(to, text, bus, win, func_ok, func_err, x):
   sc.bounce_set(0, 0)
   sc.show()
   anchor = elementary.AnchorBlock(inwin)
-  anchor.text_set(str(x))
+  anchor.text_set(str(dx))
   anchor.show()
   sc.content_set(anchor)
   sc.size_hint_weight_set(1.0, 1.0)
@@ -63,17 +80,20 @@ def dbus_gsm_err(to, text, bus, win, func_ok, func_err, x):
 
   inwin.activate()
 
-def dbus_err(x):
+def dbus_opimd_err(to, msg, props, bus, win, func_ok, func_err, x):
+  # TODO: call the same code, as dbus_gsm_err
   print "dbus error! "+str(x)
 
 def send_msg(to, entry, bus, inwin, win, func_ok, func_err, *args, **kwargs):
-  ogsmd = getDbusObject (bus, "org.freesmartphone.ogsmd", "/org/freesmartphone/GSM/Device", "org.freesmartphone.GSM.SMS")
-
   msg = entry.entry_get().replace('<br>','')
-  ogsmd.SendMessage(to[0].replace('tel:','') ,msg, {}, reply_handler=dbus_sms_ok, error_handler=partial(dbus_gsm_err, to, msg, bus, win, func_ok, func_err) )
+  props = {'status-report-request':1}
+
+#  ogsmd.SendMessage(to[0].replace('tel:','') ,msg, props, reply_handler=dbus_sms_ok, error_handler=partial(dbus_gsm_err, to, msg, bus, win, func_ok, func_err) )
+
+  message = {'Recipient':to[0],'Direction':'out','Folder':'SMS','Text':msg, 'MessageSent':0, 'Processing':1}
 
   messages = getDbusObject (bus, "org.freesmartphone.opimd", "/org/freesmartphone/PIM/Messages", "org.freesmartphone.PIM.Messages")
-  messages.Add({'Recipient':to[0],'Direction':'out','Folder':'SMS','Text':msg}, reply_handler=partial(dbus_opimd_ok, func_ok), error_handler=dbus_err)
+  messages.Add(message, reply_handler=partial(dbus_opimd_ok, to, msg, props, bus, win, func_ok, func_err), error_handler=partial(dbus_opimd_err, to, msg, props, bus, win, func_ok, func_err))
 
   inwin.delete()
 

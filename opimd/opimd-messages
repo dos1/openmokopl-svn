@@ -7,6 +7,7 @@ from functools import partial
 import elementary
 from opimd_utils import opimd_reply
 
+message_list = []
 cache = {}
 
 def resolve_phone(number):
@@ -26,6 +27,7 @@ def delete_msg(path, bubble, button, event, *args, **kwargs):
   message = getDbusObject (bus, "org.freesmartphone.opimd", path, "org.freesmartphone.PIM.Message")
   message.Delete()
   bubble.delete()
+  del bubble
 
 def destroy(obj, event, *args, **kargs):
   print "kabum"
@@ -47,7 +49,7 @@ try:
 except IndexError:
   pass
 
-def render_message(message):
+def render_message(message, incoming = False):
   bubble = elementary.Bubble(win)
 
   textbox = elementary.Box(win)
@@ -120,13 +122,18 @@ def render_message(message):
   textbox.pack_end(btnframe)
   textbox.show()
 
-  box.pack_start(bubble)
+  message_list.append(bubble)
+  if incoming:
+    box.pack_start(bubble)
+  else:
+    box.pack_end(bubble)
 
+  win.show()
 
 def add_new_message(q):
   message = getDbusObject (bus, "org.freesmartphone.opimd", q, "org.freesmartphone.PIM.Message")
   result = message.GetContent()
-  render_message(result)
+  render_message(result, True)
 
 messages = getDbusObject (bus, "org.freesmartphone.opimd", "/org/freesmartphone/PIM/Messages", "org.freesmartphone.PIM.Messages")
 contacts = getDbusObject (bus, "org.freesmartphone.opimd", "/org/freesmartphone/PIM/Contacts", "org.freesmartphone.PIM.Contacts")
@@ -161,18 +168,61 @@ box.size_hint_align_set(-1.0, -1.0)
 scroll.content_set(box)
 
 #total_results = 10
-results = query.GetMultipleResults(total_results)
+#results = query.GetMultipleResults(total_results)
 
-for i in results:
+def end(x):
+  print str(x)
+
+def go_next(obj, event, *args, **kwargs):
+  global message_list
+  for bubble in message_list:
+    try:
+      bubble.delete()
+      del bubble
+    except:
+      pass
+  message_list = []
+  try:
+    obj.delete()
+  except:
+    print "FIXME: why it sometimes fails?"
+  proceed()  
+
+def proceed():
+  global counter
+  if counter<5:
+    query.GetResult(reply_handler=next_result, error_handler=end)
+  else:
+    print "Counter reached"
+    next = elementary.Button(win)
+    next.label_set("Next page")
+    next.scale_set(2.0)
+    next.show()
+    next.clicked = go_next
+    box.pack_end(next)
+    counter = 0
+
+def next_result(res):
+  global counter
+  counter = counter + 1
+#  render_message(res)
+  query.Skip(-2, reply_handler=proceed, error_handler=end)
+  render_message(res)
+
+#for i in results:
   #print "Result nr "+str(i+1)+":"
   #result = query.GetResult()
 
-  render_message(results[i])
+#  render_message(results[i])
+
+counter = 0
+query.Skip(total_results-1)
+proceed()
 
 print "Finished" # finito, fertig, koniec etc.
 
 win.destroy = destroy
-win.show()
+#win.show()
 
 messages.connect_to_signal("NewMessage", add_new_message)
 
