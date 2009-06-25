@@ -49,7 +49,7 @@ try:
 except IndexError:
   pass
 
-def display_message_status(label, out, data):
+def display_message_status(icon, out, data):
   try:
     processing = data['Processing']
   except:
@@ -72,20 +72,21 @@ def display_message_status(label, out, data):
   if out:
     if processing:
       if sent:
-        text='Dunno???'
+        text='unknown'
       else:
-        text='Sending'
+        text='sending'
     else:
       if sent:
-        text='Sent'
+        text='sent'
       else:
-        text='Error'
+        text='unsent'
   else:
     if read:
-      text='Read'
+      text='read'
     else:
-      text='Unread'
-  label.label_set(text)  
+      text='unread'
+  icon.file_set("/usr/share/pixmaps/opimd-utils/"+text+".png")
+#  label.label_set(text)  
 
 def render_message(message, incoming = False):
   bubble = elementary.Bubble(win)
@@ -99,9 +100,9 @@ def render_message(message, incoming = False):
 
   timestamp = ''
 
-  label = elementary.Label(win)
-  label.show()
-  bubble.icon_set(label)
+  icon = elementary.Icon(win)
+  icon.show()
+  bubble.icon_set(icon)
 
   if message['Direction']=='in':
     out = 0
@@ -117,10 +118,10 @@ def render_message(message, incoming = False):
     bubble.info_set(name)
     bubble.label_set(timestamp)
 
-  display_message_status(label, out, message)
+  display_message_status(icon, out, message)
 
   messageproxy = getDbusObject(bus, "org.freesmartphone.opimd", message['Path'], "org.freesmartphone.PIM.Message")
-  signal = messageproxy.connect_to_signal("MessageUpdated", partial(display_message_status, label, out))
+  signal = messageproxy.connect_to_signal("MessageUpdated", partial(display_message_status, icon, out))
 
 
 #  photo = elementary.Photo(win)

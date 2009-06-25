@@ -67,7 +67,7 @@ def dbus_ok():
 def dbus_err(x):
   print "dbus error! Msg: " + str(x)
 
-def display_message_status(label, out, data):
+def display_message_status(icon, out, data):
   try:
     processing = data['Processing']
   except:
@@ -91,21 +91,20 @@ def display_message_status(label, out, data):
   if out:
     if processing:
       if sent:
-        text='Dunno???'
+        text='unknown'
       else:
-        text='Sending'
+        text='sending'
     else:
       if sent:
-        text='Sent'
+        text='sent'
       else:
-        text='Error'
+        text='unsent'
   else:
     if read:
-      text='Read'
+      text='read'
     else:
-      text='Unread'
-  label.label_set(text)
-
+      text='unread'
+  icon.file_set("/usr/share/pixmaps/opimd-utils/"+text+".png")
 
 def show_msg(msg, text, bubble, obj, *args, **kwargs):
   obj.delete()
@@ -201,9 +200,9 @@ def incoming_message(x, just_unread = False):
   text.size_hint_weight_set(1.0, 0.0)
   text.size_hint_align_set(-1.0, -1.0)
 
-  label = elementary.Label(win)
-  label.show()
-  bubble.icon_set(label)
+  icon = elementary.Icon(win)
+  icon.show()
+  bubble.icon_set(icon)
 
   timestamp = ''
 
@@ -215,7 +214,7 @@ def incoming_message(x, just_unread = False):
     bubble.info_set(timestamp)
 
     try:
-      smsclass=result['_sms_message-class']
+      smsclass=result['SMS-message-class']
     except KeyError:
       smsclass=1
 
@@ -255,10 +254,10 @@ def incoming_message(x, just_unread = False):
     text.show()
     bubble.content_set(text)
 
-  display_message_status(label, out, result)
+  display_message_status(icon, out, result)
 
   messageproxy = getDbusObject(bus, "org.freesmartphone.opimd", result['Path'], "org.freesmartphone.PIM.Message")
-  signal = messageproxy.connect_to_signal("MessageUpdated", partial(display_message_status, label, out))
+  signal = messageproxy.connect_to_signal("MessageUpdated", partial(display_message_status, icon, out))
 
 #  photo = elementary.Photo(win)
 #  photo.size_set(1)
