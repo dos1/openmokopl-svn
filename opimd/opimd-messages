@@ -49,6 +49,44 @@ try:
 except IndexError:
   pass
 
+def display_message_status(label, out, data):
+  try:
+    processing = data['Processing']
+  except:
+    processing = 0
+
+  try:
+    sent = data['MessageSent']
+  except:
+    sent = 0
+
+  try:
+    read = data['MessageRead']
+  except:
+    read = 0
+
+  print "Out: " + str(out)   
+  print "Processing: " + str(processing)
+  print "Sent: " + str(sent)
+  print "Read: " + str(read)
+  if out:
+    if processing:
+      if sent:
+        text='Dunno???'
+      else:
+        text='Sending'
+    else:
+      if sent:
+        text='Sent'
+      else:
+        text='Error'
+  else:
+    if read:
+      text='Read'
+    else:
+      text='Unread'
+  label.label_set(text)  
+
 def render_message(message, incoming = False):
   bubble = elementary.Bubble(win)
 
@@ -60,6 +98,19 @@ def render_message(message, incoming = False):
   text.show()
 
   timestamp = ''
+
+  label = elementary.Label(win)
+  label.show()
+  bubble.icon_set(label)
+
+  if message['Direction']=='out':
+    out=1
+  else:
+    out=0
+  display_message_status(label, out, message)
+
+  messageproxy = getDbusObject(bus, "org.freesmartphone.opimd", message['Path'], "org.freesmartphone.PIM.Message")
+  signal = messageproxy.connect_to_signal("MessageUpdated", partial(display_message_status, label, out))
 
   if message['Direction']=='in':
     number = message['Sender']
@@ -73,10 +124,10 @@ def render_message(message, incoming = False):
     bubble.info_set(name)
     bubble.label_set(timestamp)
 
-  photo = elementary.Photo(win)
-  photo.size_set(3)
-  bubble.icon_set(photo)
-  photo.show()
+#  photo = elementary.Photo(win)
+#  photo.size_set(3)
+#  bubble.icon_set(photo)
+#  photo.show()
 
   bubble.content_set(textbox)
 
@@ -122,7 +173,7 @@ def render_message(message, incoming = False):
   textbox.pack_end(btnframe)
   textbox.show()
 
-  message_list.append(bubble)
+  message_list.append((bubble,signal))
   if incoming:
     box.pack_start(bubble)
   else:
@@ -175,9 +226,13 @@ def end(x):
 
 def go_next(obj, event, *args, **kwargs):
   global message_list
-  for bubble in message_list:
+  for message in message_list:
     try:
+      bubble = message[0]
+      signal = message[1]
       bubble.delete()
+      signal.remove()
+      del signal
       del bubble
     except:
       pass
