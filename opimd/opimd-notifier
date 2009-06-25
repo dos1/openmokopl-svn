@@ -29,8 +29,12 @@ def resolve_phone(number):
 def destroy(win, event, *args, **kargs):
   global message_list
   print "kabum"
-  for bubble in message_list:
+  for message in message_list:
+    bubble = message[0]
+    signal = message[1]
     bubble.delete()
+    signal.remove()
+    del signal
     del bubble  
   message_list = []
   win.hide()
@@ -62,6 +66,46 @@ def dbus_ok():
 
 def dbus_err(x):
   print "dbus error! Msg: " + str(x)
+
+def display_message_status(label, out, data):
+  try:
+    processing = data['Processing']
+  except:
+    processing = 0
+
+  try:
+    sent = data['MessageSent']
+  except:
+    sent = 0
+
+  try:
+    read = data['MessageRead']
+  except:
+    read = 0
+
+  print "Out: " + str(out)
+  print "Processing: " + str(processing)
+  print "Sent: " + str(sent)
+  print "Read: " + str(read)
+
+  if out:
+    if processing:
+      if sent:
+        text='Dunno???'
+      else:
+        text='Sending'
+    else:
+      if sent:
+        text='Sent'
+      else:
+        text='Error'
+  else:
+    if read:
+      text='Read'
+    else:
+      text='Unread'
+  label.label_set(text)
+
 
 def show_msg(msg, text, bubble, obj, *args, **kwargs):
   obj.delete()
@@ -157,9 +201,14 @@ def incoming_message(x, just_unread = False):
   text.size_hint_weight_set(1.0, 0.0)
   text.size_hint_align_set(-1.0, -1.0)
 
+  label = elementary.Label(win)
+  label.show()
+  bubble.icon_set(label)
+
   timestamp = ''
 
   if result['Direction']=='in':
+    out = 0
     number = result['Sender']
     name = resolve_phone(number)
     bubble.label_set(name)
@@ -197,6 +246,7 @@ def incoming_message(x, just_unread = False):
       text.show()
       bubble.content_set(text)
   else:
+    out = 1
     bubble.corner_set("top_right")
     number = result['Recipient']
     name = resolve_phone(number)
@@ -204,6 +254,11 @@ def incoming_message(x, just_unread = False):
     bubble.label_set(timestamp)
     text.show()
     bubble.content_set(text)
+
+  display_message_status(label, out, result)
+
+  messageproxy = getDbusObject(bus, "org.freesmartphone.opimd", result['Path'], "org.freesmartphone.PIM.Message")
+  signal = messageproxy.connect_to_signal("MessageUpdated", partial(display_message_status, label, out))
 
 #  photo = elementary.Photo(win)
 #  photo.size_set(1)
@@ -214,7 +269,7 @@ def incoming_message(x, just_unread = False):
   bubble.size_hint_weight_set(1.0, 0.0)
   bubble.size_hint_align_set(-1.0, -1.0)
 
-  message_list.append(bubble)
+  message_list.append((bubble, signal))
 
   box.pack_start(bubble)
 
