@@ -28,6 +28,7 @@ def resolve_phone(number):
 
 def destroy(win, event, *args, **kargs):
   global message_list
+  global cache
   print "kabum"
   for message in message_list:
     bubble = message[0]
@@ -37,6 +38,7 @@ def destroy(win, event, *args, **kargs):
     del signal
     del bubble  
   message_list = []
+  cache = {}
   win.hide()
 #  elementary.exit()
 
