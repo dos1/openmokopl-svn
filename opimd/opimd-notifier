@@ -245,6 +245,7 @@ def incoming_message(x, just_unread = False):
       bubble.content_set(read)
     else:
       text.show()
+      query.Update({'MessageRead':1}, reply_handler=dbus_ok, error_handler=dbus_err)
       bubble.content_set(text)
   else:
     out = 1
