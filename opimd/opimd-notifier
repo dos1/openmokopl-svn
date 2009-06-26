@@ -69,17 +69,17 @@ def dbus_err(x):
 
 def display_message_status(icon, out, data):
   try:
-    processing = data['Processing']
+    processing = int(data['Processing'])
   except:
     processing = 0
 
   try:
-    sent = data['MessageSent']
+    sent = int(data['MessageSent'])
   except:
     sent = 0
 
   try:
-    read = data['MessageRead']
+    read = int(data['MessageRead'])
   except:
     read = 0
 
@@ -195,7 +195,7 @@ def incoming_message(x, just_unread = False):
   bubble = elementary.Bubble(win)
   text = elementary.AnchorBlock(win)
 
-  text.text_set(result['Text'])
+  text.text_set(result['Content'])
   text.show()
   text.size_hint_weight_set(1.0, 0.0)
   text.size_hint_align_set(-1.0, -1.0)

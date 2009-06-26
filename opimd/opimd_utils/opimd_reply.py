@@ -93,9 +93,10 @@ def send_msg(to, entry, bus, inwin, win, func_ok, func_err, *args, **kwargs):
 
 #  ogsmd.SendMessage(to[0].replace('tel:','') ,msg, props, reply_handler=dbus_sms_ok, error_handler=partial(dbus_gsm_err, to, msg, bus, win, func_ok, func_err) )
 
-  message = {'Recipient':to[0],'Direction':'out','Folder':'SMS','Text':msg, 'MessageSent':0, 'Processing':1}
+  message = {'Recipient':to[0],'Direction':'out','Folder':'SMS','Content':msg, 'MessageSent':0, 'Processing':1}
 
-  #TODO: add sms props to opimd message
+  for field in props:
+    message['SMS-'+field]=props[field]
 
   messages = getDbusObject (bus, "org.freesmartphone.opimd", "/org/freesmartphone/PIM/Messages", "org.freesmartphone.PIM.Messages")
   messages.Add(message, reply_handler=partial(dbus_opimd_ok, to, msg, props, bus, win, func_ok, func_err), error_handler=partial(dbus_opimd_err, to, msg, props, bus, win, func_ok, func_err))
