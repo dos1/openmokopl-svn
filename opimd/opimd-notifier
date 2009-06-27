@@ -70,25 +70,42 @@ def dbus_err(x):
   print "dbus error! Msg: " + str(x)
 
 def display_message_status(icon, out, data):
+
+  something = 0
+
   try:
-    processing = int(data['Processing'])
+    processing = data['Processing']
+    something = 1
   except:
     processing = 0
 
   try:
-    sent = int(data['MessageSent'])
+    sent = data['MessageSent']
+    something = 1
   except:
     sent = 0
 
   try:
-    read = int(data['MessageRead'])
+    read = data['MessageRead']
+    something = 1
   except:
     read = 0
+
+  try:
+    delivered = data['SMS-delivered']
+    sent = 1
+    something = 1
+  except:
+    delivered = -1
+
+  if not something:
+    return 0
 
   print "Out: " + str(out)
   print "Processing: " + str(processing)
   print "Sent: " + str(sent)
   print "Read: " + str(read)
+  print "Delivered: " + str(delivered)
 
   if out:
     if processing:
@@ -98,7 +115,12 @@ def display_message_status(icon, out, data):
         text='sending'
     else:
       if sent:
-        text='sent'
+        if delivered==1:
+          text='delivered'
+        elif delivered==0:
+          text='notdelivered'
+        else:
+          text='sent'
       else:
         text='unsent'
   else:
