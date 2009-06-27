@@ -1,2 +1,2 @@
 #!/bin/sh
-DISPLAY=:0 opimd-notifier &
+DISPLAY=:0 ELM_ENGINE=x11-16 opimd-notifier &
