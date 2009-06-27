@@ -95,7 +95,7 @@ def render_message(message, incoming = False):
   text = elementary.AnchorBlock(win)
   textbox.pack_start(text)
 
-  text.text_set(message['Content'])
+  text.text_set(elementary.Entry.utf8_to_markup(message['Content']))
   text.show()
 
   timestamp = ''

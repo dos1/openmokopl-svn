@@ -52,7 +52,7 @@ def dbus_gsm_err(to, text, props, x, bus, win, func_ok, func_err, dx):
   sc.bounce_set(0, 0)
   sc.show()
   anchor = elementary.AnchorBlock(inwin)
-  anchor.text_set(str(dx))
+  anchor.text_set(elementary.Entry.utf8_to_markup(str(dx)))
   anchor.show()
   sc.content_set(anchor)
   sc.size_hint_weight_set(1.0, 1.0)
@@ -87,7 +87,7 @@ def dbus_opimd_err(to, msg, props, bus, win, func_ok, func_err, x):
   print "dbus error! "+str(x)
 
 def send_msg(to, entry, bus, inwin, win, func_ok, func_err, *args, **kwargs):
-  msg = entry.entry_get().replace('<br>','')
+  msg = entry.markup_to_utf8(entry.entry_get())
 #  props = {'status-report-request':1}
   props = {}
 
@@ -107,7 +107,7 @@ def inwindelete(win, *args, **kwargs):
   win.delete()
 
 def update_chars(label, obj, event, *args, **kwargs):
-  label.label_set("(%d)" % len(obj.entry_get().replace('<br>','')))
+  label.label_set("(%d)" % len(obj.markup_to_utf8(obj.entry_get())))
 
 def reply(to, text, bus, win, func_ok, func_err, *args, **kwargs):
   inwin = elementary.InnerWindow(win)
@@ -122,7 +122,7 @@ def reply(to, text, bus, win, func_ok, func_err, *args, **kwargs):
   tbox.horizontal_set(1)  
 
   label = elementary.Label(inwin)
-  label.label_set("To: "+to[1])
+  label.label_set("To: "+elementary.Entry.utf8_to_markup(to[1]))
   label.show()
   tbox.pack_start(label)
 
@@ -140,7 +140,8 @@ def reply(to, text, bus, win, func_ok, func_err, *args, **kwargs):
   box.pack_start(tbox)
   scroll = elementary.Scroller(inwin)
   entry = elementary.Entry(inwin)
-  entry.entry_set(text)
+  if text:
+    entry.entry_set(entry.utf8_to_markup(text))
   entry.changed = partial(update_chars, chars)
   entry.size_hint_weight_set(1.0, 1.0)
   entry.size_hint_align_set(-1.0, -1.0)
