@@ -28,16 +28,18 @@ def resolve_phone(number):
 
 def destroy(win, event, *args, **kargs):
   global message_list
+  global signal_list
   global cache
   print "kabum"
-  for message in message_list:
-    bubble = message[0]
-    signal = message[1]
+  for bubble in message_list:
     bubble.delete()
+    del bubble
+
+  for signal in signal_list:
     signal.remove()
     del signal
-    del bubble  
   message_list = []
+  signal_list = []
   cache = {}
   win.hide()
 #  elementary.exit()
@@ -69,9 +71,25 @@ def dbus_ok():
 def dbus_err(x):
   print "dbus error! Msg: " + str(x)
 
-def display_message_status(icon, out, data):
+def handle_csm(msg, text, data):
+  try:
+    content = data['Content']
+#    text.text_set(elementary.Entry.utf8_to_markup(content))
+    if not data['MessageRead']:
+      msg.Update({'MessageRead':1})
+  except KeyError:
+    pass
+
+def display_message_status(icon, out, text, data):
 
   something = 0
+
+  try:
+    content = data['Content']
+    text.text_set(elementary.Entry.utf8_to_markup(content))
+    something = 1
+  except KeyError:
+    pass 
 
   try:
     processing = data['Processing']
@@ -130,11 +148,13 @@ def display_message_status(icon, out, data):
       text='unread'
   icon.file_set("/usr/share/pixmaps/opimd-utils/"+text+".png")
 
-def show_msg(msg, text, bubble, obj, *args, **kwargs):
+def show_msg(msg, box, bubble, text, obj, *args, **kwargs):
   obj.delete()
-  bubble.content_set(text)
-  text.show()
+  bubble.content_set(box)
+  box.show()
   msg.Update({'MessageRead':1}, reply_handler=dbus_ok, error_handler=dbus_err)
+  signal = msg.connect_to_signal("MessageUpdated", partial(handle_csm, msg, text))
+  signal_list.append(signal)
 
 def close_win(obj, event, *args, **kwargs):
   destroy(win, event, args, kwargs)
@@ -210,6 +230,7 @@ boxb.pack_end(close)
 win.destroy = destroy
 
 message_list = []
+signal_list = []
 
 def incoming_message(x, just_unread = False):
   print "Query: " + x
@@ -260,7 +281,7 @@ def incoming_message(x, just_unread = False):
         read.label_set("Unread message!")
       else:
         read.label_set("New message arrived!")
-      read.clicked = partial(show_msg, query, textbox, bubble, read)
+      read.clicked = partial(show_msg, query, textbox, bubble, text, read)
 
       read.show()
       replybtn.clicked = partial(opimd_reply.reply, [number, name], '', bus, win, incoming_message, win.show)
@@ -279,10 +300,10 @@ def incoming_message(x, just_unread = False):
     text.show()
     bubble.content_set(text)
 
-  display_message_status(icon, out, result)
+  display_message_status(icon, out, text, result)
 
-  messageproxy = getDbusObject(bus, "org.freesmartphone.opimd", result['Path'], "org.freesmartphone.PIM.Message")
-  signal = messageproxy.connect_to_signal("MessageUpdated", partial(display_message_status, icon, out))
+#  messageproxy = getDbusObject(bus, "org.freesmartphone.opimd", result['Path'], "org.freesmartphone.PIM.Message")
+  signal = query.connect_to_signal("MessageUpdated", partial(display_message_status, icon, out, text))
 
 #  photo = elementary.Photo(win)
 #  photo.size_set(1)
@@ -293,7 +314,8 @@ def incoming_message(x, just_unread = False):
   bubble.size_hint_weight_set(1.0, 0.0)
   bubble.size_hint_align_set(-1.0, -1.0)
 
-  message_list.append((bubble, signal))
+  message_list.append(bubble)
+  signal_list.append(signal)
 
   box.pack_start(bubble)
 
