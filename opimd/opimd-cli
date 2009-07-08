@@ -102,6 +102,8 @@ try:
     domain = 'Contact'
   elif argv[1].lower()=='messages' or argv[1].lower()=='m':
     domain = 'Message'
+  elif argv[1].lower()=='calls' or argv[1].lower()=='ca':
+    domain = 'Call'
   else:
     raise IndexError
 
