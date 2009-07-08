@@ -5,6 +5,7 @@ import dbus, e_dbus
 from sys import argv
 from os import system
 from time import sleep
+import time
 from functools import partial
 from opimd_utils import opimd_reply
 import elementary
@@ -56,6 +57,7 @@ while (not initialized):
   try:
     messages = getDbusObject (bus, "org.freesmartphone.opimd", "/org/freesmartphone/PIM/Messages", "org.freesmartphone.PIM.Messages")
     contacts = getDbusObject (bus, "org.freesmartphone.opimd", "/org/freesmartphone/PIM/Contacts", "org.freesmartphone.PIM.Contacts")
+    calls = getDbusObject (bus, "org.freesmartphone.opimd", "/org/freesmartphone/PIM/Calls", "org.freesmartphone.PIM.Calls")
     initialized = True
   except:
     print "Init failed"
@@ -167,8 +169,12 @@ def open_inbox(obj, event, *args, **kwargs):
   system("opimd-messages &")
   destroy(win, event, args, kwargs)
 
-win = elementary.Window("incoming-opimd-message", 1)
-win.title_set("opimd Notifier")
+def resolve_time(time):
+#  return time
+  return ''
+
+win = elementary.Window("opimd-notifier", 1)
+win.title_set("Notifier")
 
 bg = elementary.Background(win)
 win.resize_object_add(bg)
@@ -231,6 +237,36 @@ win.destroy = destroy
 
 message_list = []
 signal_list = []
+
+def missed_call(x, just_unread = False):
+  print "Query: " + x
+  query = getDbusObject (bus, "org.freesmartphone.opimd", x, "org.freesmartphone.PIM.Call")
+  result = query.GetContent()
+
+  query.Update({'New':0})
+
+  bubble = elementary.Bubble(win)
+  text = elementary.AnchorBlock(win)
+  text.show()
+  text.size_hint_weight_set(1.0, 0.0)
+  text.size_hint_align_set(-1.0, -1.0)
+
+  timestamp = time.strftime('%a, %d %b %Y %H:%M:%S',time.localtime(result['Timestamp']))
+  text.text_set('Missed call at ' + timestamp)
+  bubble.label_set(resolve_phone(result['Caller']))
+  bubble.info_set(resolve_time(result['Timestamp']))
+
+  bubble.content_set(text)
+  bubble.show()
+  bubble.size_hint_weight_set(1.0, 0.0)
+  bubble.size_hint_align_set(-1.0, -1.0)
+
+  message_list.append(bubble)
+
+  box.pack_start(bubble)
+
+  print "Finished" # finito, fertig, koniec etc.
+  win.show()
 
 def incoming_message(x, just_unread = False):
   print "Query: " + x
@@ -323,6 +359,7 @@ def incoming_message(x, just_unread = False):
   win.show()
 
 messages.connect_to_signal("IncomingMessage", incoming_message)
+calls.connect_to_signal("MissedCall", missed_call)
 
 x = messages.Query({'Direction':'in','MessageRead':0})
 query = getDbusObject (bus, "org.freesmartphone.opimd", x, "org.freesmartphone.PIM.MessageQuery")
@@ -334,6 +371,15 @@ for i in range(0, results_num):
 
 #incoming_message("/org/freesmartphone/PIM/Messages/339")
 #incoming_message("/org/freesmartphone/PIM/Messages/340")
+
+x = calls.Query({'Direction':'in','New':1,'Answered':0})
+query = getDbusObject (bus, "org.freesmartphone.opimd", x, "org.freesmartphone.PIM.CallQuery")
+results_num = query.GetResultCount()
+for i in range(0, results_num):
+  path = query.GetCallPath()
+  print path
+  missed_call(path, True)
+
 
 print "Ready"
 
