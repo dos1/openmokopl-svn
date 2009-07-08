@@ -33,7 +33,10 @@ def dbus_err(x):
 
 def dbus_sms_ok(x, bus, a, b):
   message = getDbusObject (bus, "org.freesmartphone.opimd", x, "org.freesmartphone.PIM.Message")
-  data = {'MessageSent':1, 'Processing':0, 'SMS-message-reference':a}
+  data = {'MessageSent':1, 'Processing':0}
+  ops = loadOpts()
+  if ops['report']: 
+      data['SMS-message-reference']=a
   message.Update(data, reply_handler=dbus_ok, error_handler=dbus_err)
 #  print a
 #  print b
