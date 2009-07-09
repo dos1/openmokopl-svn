@@ -5,7 +5,7 @@ from sys import argv
 def resolve_phone(number):
   x = contacts.Query({'Phone':number.strip('tel:')})
   query = getDbusObject (bus, "org.freesmartphone.opimd", x, "org.freesmartphone.PIM.ContactQuery")
-  if query.GetResultCount()==1:
+  if query.GetResultCount():
     return query.GetResult()['Name']
   else:
     return "nothing"

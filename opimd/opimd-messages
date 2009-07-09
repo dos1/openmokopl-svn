@@ -16,7 +16,7 @@ def resolve_phone(number):
   else:
     x = contacts.Query({'Phone':number.strip('tel:')})
     query = getDbusObject (bus, "org.freesmartphone.opimd", x, "org.freesmartphone.PIM.ContactQuery")
-    if query.GetResultCount()==1:
+    if query.GetResultCount():
       name = query.GetResult()['Name']
     else:
       name = number.strip('tel:')
