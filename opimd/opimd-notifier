@@ -169,9 +169,17 @@ def open_inbox(obj, event, *args, **kwargs):
   system("opimd-messages &")
   destroy(win, event, args, kwargs)
 
-def resolve_time(time):
-#  return time
-  return ''
+def resolve_time(t):
+  try:
+    t = float(t)
+  except:
+    return ''
+  if time.time()-t < 24*60*60:
+    return time.strftime('%H:%M',time.localtime(t))
+  elif time.time()-t < 24*60*60*2:
+    return 'Yesterday'
+  else:
+    return time.strftime('%d %b',time.localtime(t))
 
 win = elementary.Window("opimd-notifier", 1)
 win.title_set("Notifier")
@@ -251,7 +259,13 @@ def missed_call(x, just_unread = False):
   text.size_hint_weight_set(1.0, 0.0)
   text.size_hint_align_set(-1.0, -1.0)
 
-  timestamp = time.strftime('%a, %d %b %Y %H:%M:%S',time.localtime(result['Timestamp']))
+  icon = elementary.Icon(win)
+  icon.show()   
+  bubble.icon_set(icon)
+
+  icon.file_set("/usr/share/pixmaps/opimd-utils/phonecall.png")
+
+  timestamp = time.strftime('%H:%M:%S, %d %b %Y',time.localtime(float(result['Timestamp'])))
   text.text_set('Missed call at ' + timestamp)
   bubble.label_set(resolve_phone(result['Caller']))
   bubble.info_set(resolve_time(result['Timestamp']))
@@ -285,7 +299,10 @@ def incoming_message(x, just_unread = False):
   icon.show()
   bubble.icon_set(icon)
 
-  timestamp = ''
+  if result.has_key('Timestamp'):
+    timestamp = resolve_time(result['Timestamp'])
+  else:
+    timestamp = ''
 
   if result['Direction']=='in':
     out = 0
@@ -332,7 +349,7 @@ def incoming_message(x, just_unread = False):
     number = result['Recipient']
     name = resolve_phone(number)
     bubble.info_set(name)
-    bubble.label_set(timestamp)
+#    bubble.label_set(timestamp)
     text.show()
     bubble.content_set(text)
 
@@ -380,6 +397,7 @@ for i in range(0, results_num):
   print path
   missed_call(path, True)
 
+#missed_call("/org/freesmartphone/PIM/Calls/5")
 
 print "Ready"
 
