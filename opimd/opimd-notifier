@@ -4,13 +4,14 @@
 import dbus, e_dbus
 from sys import argv
 from os import system
-from time import sleep
 import time
 from functools import partial
 from opimd_utils import opimd_reply
 import elementary
 
 MESSAGES_ICON              = "/usr/share/icons/shr/86x86/apps/openmoko-messages.png"
+PHONELOG_ICON              = "/usr/share/pixmaps/phonelog.png"
+
 
 cache = {}
 
@@ -61,7 +62,7 @@ while (not initialized):
     initialized = True
   except:
     print "Init failed"
-    sleep(10)
+    time.sleep(10)
 
 elementary.init()
 
@@ -169,6 +170,10 @@ def open_inbox(obj, event, *args, **kwargs):
   system("opimd-messages &")
   destroy(win, event, args, kwargs)
 
+def open_phonelog(obj, event, *args, **kwargs):
+  system("phonelog &")
+  destroy(win, event, args, kwargs) 
+
 def resolve_time(t):
   try:
     t = float(t)
@@ -215,17 +220,31 @@ boxb.size_hint_weight_set(-1.0, 0.0)
 boxb.size_hint_align_set(-1.0, -1.0)
 boxb.horizontal_set(1)
 
-inbox = elementary.Button(win)
-inbox.show()
-inbox.clicked = open_inbox
-inbox.size_hint_weight_set(1.0, 0.0)
-inbox.size_hint_align_set(-1.0, 0.0)
-inbox.label_set("Go to inbox")
-inbox_icon = elementary.Icon(inbox)
-inbox_icon.file_set(MESSAGES_ICON)
-inbox_icon.scale_set(1, 1)
-inbox.icon_set(inbox_icon)
-boxb.pack_start(inbox)
+hoversel = elementary.Hoversel(win)
+hoversel.hover_parent_set(win)
+hoversel.label_set("Go to...")
+hoversel.show()
+
+#inbox = elementary.Button(win)
+#inbox.show()
+#inbox.clicked = open_inbox
+hoversel.size_hint_weight_set(1.0, 0.0)
+hoversel.size_hint_align_set(-1.0, 0.0)
+#inbox.label_set("Go to inbox")
+#inbox_icon = elementary.Icon(hoversel)
+#inbox_icon.file_set(MESSAGES_ICON)
+#inbox_icon.scale_set(1, 1)
+#inbox.icon_set(inbox_icon)
+
+hoversel.scale_set(1.0)
+
+hoversel.item_add('Phone log', PHONELOG_ICON,
+1, open_phonelog)
+hoversel.item_add('Messages inbox', MESSAGES_ICON, 
+1, open_inbox)
+
+
+boxb.pack_start(hoversel)
 
 #delete = elementary.Button(win)
 #delete.show()
@@ -401,7 +420,7 @@ for i in range(0, results_num):
   print path
   missed_call(path, True)
 
-#missed_call("/org/freesmartphone/PIM/Calls/5")
+#missed_call("/org/freesmartphone/PIM/Calls/0")
 
 print "Ready"
 

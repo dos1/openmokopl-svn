@@ -3,6 +3,7 @@
 
 import dbus, e_dbus
 from sys import argv
+import time
 from functools import partial
 import elementary
 from opimd_utils import opimd_reply
@@ -22,6 +23,18 @@ def resolve_phone(number):
       name = number.strip('tel:')
     cache[number] = name
     return name
+
+def resolve_time(t):
+  try:
+    t = float(t)
+  except:
+    return '' 
+  if time.time()-t < 24*60*60:
+    return time.strftime('%H:%M',time.localtime(t))
+  elif time.time()-t < 24*60*60*2:
+    return 'Yesterday'
+  else:
+    return time.strftime('%d %b',time.localtime(t))
 
 def delete_msg(path, bubble, button, event, *args, **kwargs):
   message = getDbusObject (bus, "org.freesmartphone.opimd", path, "org.freesmartphone.PIM.Message")
@@ -119,7 +132,10 @@ def render_message(message, incoming = False):
   text.text_set(elementary.Entry.utf8_to_markup(message['Content']))
   text.show()
 
-  timestamp = ''
+  if message.has_key('Timestamp'):
+    timestamp = resolve_time(message['Timestamp'])
+  else:
+    timestamp = ''
 
   icon = elementary.Icon(win)
   icon.show()
@@ -137,7 +153,7 @@ def render_message(message, incoming = False):
     number = message['Recipient']
     name = resolve_phone(number)
     bubble.info_set(name)
-    bubble.label_set(timestamp)
+#    bubble.label_set(timestamp)
 
   display_message_status(icon, out, message)
 
@@ -229,7 +245,7 @@ bg.show()
 scroll = elementary.Scroller(win)
 win.resize_object_add(scroll)
 scroll.show()
-scroll.bounce_set(0, 1)
+scroll.bounce_set(0, 0)
 
 box = elementary.Box(win)
 box.show()
