@@ -194,6 +194,7 @@ class CallsTab:
 			else:
 				#don't group supressed numbers
 				#and make the contact Unknown Number
+				number = "****"
 				last_parent_added = None
 				contact = CallsTab.conf.get('phonelog',"suppressed_name")
 
@@ -404,9 +405,9 @@ class GeneralTab(CallsTab):
 
 
 class SignalMonitor:
-	PHONE_BUSNAME = 'org.freesmartphone.ogsmd'
-	PHONE_OBJECTPATH = '/org/freesmartphone/GSM/Device'
-	PHONE_INTERFACE = 'org.freesmartphone.GSM.Call'
+	PHONE_BUSNAME = 'org.freesmartphone.opimd'
+	PHONE_OBJECTPATH = '/org/freesmartphone/PIM/Calls'
+	PHONE_INTERFACE = 'org.freesmartphone.PIM.Calls'
 	__bus = None
 		
 	def __init__(self, bus):
@@ -417,29 +418,10 @@ class SignalMonitor:
 		bus = self.__bus
 		proxy = bus.get_object(self.PHONE_BUSNAME,self.PHONE_OBJECTPATH)
 		iface = dbus.Interface(proxy, self.PHONE_INTERFACE)
-		iface.connect_to_signal("CallStatus", self.cb_CallStatus, self.__config)
+		iface.connect_to_signal("NewCall", self.cb_CallAdded)
         			
-	def cb_CallStatus(self, id, status, props):
-		#should this even happen?
-		if props == None:
-			return 
-
-		
-		#we only handle release
-		if status != "release":
-			return 
-
-		"""
-		direction = props[0]
-		if direction == "incoming":
-			incoming.populateList()
-			missed.populateList()
-		elif direction == "outgoing":
-			outgoing.populateList()
-		"""
-		#on release update all, figure out how to check what to
-		#update.
-		#FIXME: possible race condition with the phonelog daemon.
+	def cb_CallAdded(self, path):
+		#TODO: check, what to update.
 		incoming.populateList()
 		missed.populateList()
 		outgoing.populateList()
@@ -710,13 +692,7 @@ init_last_view_times(config)
 
 phone_data = PhoneData(systemBus, config)
 
-#if we auto refresh is set
-try:
-	if config.getboolean('phonelog','auto_refresh'):
-		RefreshMonitor = SignalMonitor(systemBus)
-except:
-	print "Can't connect to gsm"
-
+RefreshMonitor = SignalMonitor(systemBus)
 
 if config.getboolean('phonelog','debug'):
 	print "Initialized global vars"
