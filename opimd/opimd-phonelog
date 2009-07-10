@@ -20,6 +20,7 @@ import shutil
 import re
 from math import ceil
 from datetime import datetime
+from operator import itemgetter
 
 import dbus
 import gobject, gtk
@@ -198,7 +199,7 @@ class CallsTab:
 				last_parent_added = None
 				contact = CallsTab.conf.get('phonelog',"suppressed_name")
 
-			timestamp = float(call['Timestamp'])	
+			timestamp = call['Timestamp']	
 			call_time = datetime.fromtimestamp( timestamp )
 				
 			if call['Direction'] == 'in' and call['Answered'] == 0:
@@ -212,7 +213,7 @@ class CallsTab:
 			if not call.has_key('Duration'):
 				tmp_duration = 0
 			else:
-				tmp_duration = ceil(float(call['Duration']))
+				tmp_duration = ceil(call['Duration'])
 
 			active_hours = int(tmp_duration / 3600)
 			active_minutes = int(tmp_duration / 60 - active_hours * 60)
@@ -551,7 +552,7 @@ class PhoneData:
 		else:
 			return None
 
-		#props['_limit'] = PhoneData.conf.getint('phonelog', 'general_limit') # doesn't work now
+		#props['_limit'] = PhoneData.conf.getint('phonelog', 'general_limit') # doesn't work now, opimd bug
 
 		x = interface.Query(props)
 
@@ -559,6 +560,8 @@ class PhoneData:
 		calls = query.GetMultipleResults(query.GetResultCount())
 
 		query.Dispose() # delete query result from memory
+
+		calls.sort(key=itemgetter('Timestamp'), reverse = True) # temp solution, it will be done by opimd
 
 		if config.getboolean('phonelog','debug'):
 			print "Finished getting " + type

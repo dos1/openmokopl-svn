@@ -171,7 +171,7 @@ def open_inbox(obj, event, *args, **kwargs):
   destroy(win, event, args, kwargs)
 
 def open_phonelog(obj, event, *args, **kwargs):
-  system("phonelog &")
+  system("opimd-phonelog &")
   destroy(win, event, args, kwargs) 
 
 def resolve_time(t):
