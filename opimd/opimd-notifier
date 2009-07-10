@@ -286,8 +286,8 @@ def missed_call(x, just_unread = False):
 
   timestamp = time.strftime('%H:%M:%S, %d %b %Y',time.localtime(float(result['Timestamp'])))
   text.text_set('Missed call at ' + timestamp)
-  if result.has_key('Caller'):
-    caller = resolve_phone(result['Caller'])
+  if result.has_key('Peer'):
+    caller = resolve_phone(result['Peer'])
   else:
     caller = ''
   bubble.label_set(caller)
