@@ -31,6 +31,7 @@ def resolve_phone(number):
 def destroy(win, event, *args, **kargs):
   global message_list
   global signal_list
+  global function_list
   global cache
   print "kabum"
   for bubble in message_list:
@@ -40,8 +41,13 @@ def destroy(win, event, *args, **kargs):
   for signal in signal_list:
     signal.remove()
     del signal
+
+  for function in function_list:
+    function()
+
   message_list = []
   signal_list = []
+  function_list
   cache = {}
   win.hide()
 #  elementary.exit()
@@ -264,13 +270,14 @@ win.destroy = destroy
 
 message_list = []
 signal_list = []
+function_list = []
 
 def missed_call(x, just_unread = False):
   print "Query: " + x
   query = getDbusObject (bus, "org.freesmartphone.opimd", x, "org.freesmartphone.PIM.Call")
   result = query.GetContent()
 
-  query.Update({'New':0})
+  function_list.append(partial(query.Update,{'New':0},reply_handler=dbus_ok, error_handler=dbus_err))
 
   bubble = elementary.Bubble(win)
   text = elementary.AnchorBlock(win)
